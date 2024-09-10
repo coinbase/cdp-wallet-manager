@@ -7,9 +7,24 @@ import { ArrowLeft, Wallet } from "lucide-react";
 
 // Mock data for wallet balances (replace with actual data fetching logic later)
 const walletBalances = {
-  1: { name: "Main Wallet", network: "Ethereum", addresses: 3, balances: { BTC: 0.5, ETH: 2.3, USDT: 1000 } },
-  2: { name: "Savings Wallet", network: "Bitcoin", addresses: 2, balances: { BTC: 0.1, ETH: 1.5, USDT: 500 } },
-  3: { name: "Investment Wallet", network: "Polygon", addresses: 5, balances: { BTC: 1.2, ETH: 5.0, USDT: 2000 } },
+  1: {
+    name: "Main Wallet",
+    network: "Ethereum",
+    addresses: ["0x1234...5678", "0xabcd...efgh", "0x9876...5432"],
+    balances: { BTC: 0.5, ETH: 2.3, USDT: 1000 }
+  },
+  2: {
+    name: "Savings Wallet",
+    network: "Bitcoin",
+    addresses: ["bc1qxy...zw3f0", "3J98t1...s4v8"],
+    balances: { BTC: 0.1, ETH: 1.5, USDT: 500 }
+  },
+  3: {
+    name: "Investment Wallet",
+    network: "Polygon",
+    addresses: ["0x2468...1357", "0xfedc...ba98", "0x1357...2468", "0xa1b2...c3d4", "0xe5f6...g7h8"],
+    balances: { BTC: 1.2, ETH: 5.0, USDT: 2000 }
+  },
 };
 
 export default function WalletPage({ params }: { params: { id: string } }) {
@@ -71,6 +86,26 @@ export default function WalletPage({ params }: { params: { id: string } }) {
                 <tr key={currency} className={`border-b border-gray-200 dark:border-gray-700 ${index % 2 === 0 ? 'bg-gray-50 dark:bg-gray-800' : 'bg-white dark:bg-gray-900'}`}>
                   <td className="p-3 font-medium text-gray-700 dark:text-gray-300">{currency}</td>
                   <td className="p-3 text-gray-600 dark:text-gray-300">{amount.toString()}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        
+        <h2 className="text-2xl font-semibold mb-4 mt-8 text-gray-700 dark:text-gray-200">Addresses</h2>
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+          <table className="w-full border-collapse">
+            <thead>
+              <tr className="bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-200 text-sm uppercase">
+                <th className="p-3 text-left font-semibold">Index</th>
+                <th className="p-3 text-left font-semibold">ID</th>
+              </tr>
+            </thead>
+            <tbody>
+              {wallet.addresses.map((address, index) => (
+                <tr key={index} className={`border-b border-gray-200 dark:border-gray-700 ${index % 2 === 0 ? 'bg-gray-50 dark:bg-gray-800' : 'bg-white dark:bg-gray-900'}`}>
+                  <td className="p-3 font-medium text-gray-700 dark:text-gray-300">{index}</td>
+                  <td className="p-3 text-gray-600 dark:text-gray-300 break-all">{address}</td>
                 </tr>
               ))}
             </tbody>
