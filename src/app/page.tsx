@@ -14,7 +14,10 @@ export default function Home() {
       <main className="max-w-4xl mx-auto">
         <h1 className="text-4xl font-bold mb-8 text-gray-800 dark:text-gray-100">Wallet Manager</h1>
         
-        <Link href="/create-wallet" className="inline-block bg-primary hover:bg-primary/90 text-white px-6 py-3 rounded-lg shadow-md transition duration-300 ease-in-out flex items-center space-x-2 mb-8">
+        <Link 
+          href="/create-wallet" 
+          className="inline-flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg shadow-md transition duration-300 ease-in-out mb-8"
+        >
           <PlusCircle size={20} />
           <span>Create Wallet</span>
         </Link>
@@ -32,7 +35,7 @@ export default function Home() {
             </thead>
             <tbody>
               {wallets.map((wallet, index) => (
-                <tr key={wallet.id} className={`border-b border-gray-200 dark:border-gray-700 ${index % 2 === 0 ? 'bg-gray-50 dark:bg-gray-800' : 'bg-white dark:bg-gray-900'}`}>
+                <tr key={wallet.id} className={`border-b border-gray-300 dark:border-gray-600 ${index % 2 === 0 ? 'bg-gray-50 dark:bg-gray-800' : 'bg-white dark:bg-gray-900'}`}>
                   <td className="p-3 text-gray-600 dark:text-gray-300">{wallet.id}</td>
                   <td className="p-3">
                     <Link href={`/wallet/${wallet.id}`} className="text-primary hover:text-primary/80 font-medium">

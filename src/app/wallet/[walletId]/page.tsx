@@ -5,8 +5,15 @@ import Link from "next/link";
 import { ArrowLeft, Wallet } from "lucide-react";
 
 
+export type Wallet = {
+  name: string;
+  network: string;
+  addresses: string[];
+  balances: Record<string, number>;
+};
+
 // Mock data for wallet balances (replace with actual data fetching logic later)
-const walletBalances = {
+const wallets: Record<number, Wallet> = {
   1: {
     name: "Main Wallet",
     network: "Ethereum",
@@ -28,12 +35,12 @@ const walletBalances = {
 };
 
 export default function WalletPage({ params }: { params: { walletId: string } }) {
-  const [wallet, setWallet] = useState<any>(null);
+  const [wallet, setWallet] = useState<Wallet | null>(null);
 
   useEffect(() => {
     const walletId = parseInt(params.walletId);
     // In a real app, you'd fetch the wallet data from an API here
-    const fetchedWallet = walletBalances[walletId as keyof typeof walletBalances] || {
+    const fetchedWallet = wallets[walletId as keyof typeof wallets] || {
       name: `New Wallet ${walletId}`,
       network: "Unknown",
       addresses: 0,

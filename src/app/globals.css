@@ -8,7 +8,8 @@
   --background: #ffffff;
   --foreground: #333333;
   --primary: #2563eb;
-  --secondary: #64748b;
+  --secondary: #222428;
+  --button-text: #2563eb; /* New variable for button text */
 }
 
 @media (prefers-color-scheme: dark) {
@@ -17,6 +18,7 @@
     --foreground: #f3f4f6;
     --primary: #d2def1;
     --secondary: #94a3b8;
+    --button-text: #ffffff; /* Keep white text for dark mode buttons */
   }
 }
 
@@ -58,4 +60,14 @@ a:hover {
   select option {
     color: initial;
   }
+}
+
+/* Add this new style for buttons */
+button, .button {
+  color: var(--button-text);
+  background-color: var(--primary);
+}
+
+button:hover, .button:hover {
+  background-color: var(--secondary);
 }
