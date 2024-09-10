@@ -43,7 +43,7 @@ export default function WalletPage({ params }: { params: { walletId: string } })
     const fetchedWallet = wallets[walletId as keyof typeof wallets] || {
       name: `New Wallet ${walletId}`,
       network: "Unknown",
-      addresses: 0,
+      addresses: [],
       balances: {}
     };
     setWallet(fetchedWallet);
@@ -73,8 +73,8 @@ export default function WalletPage({ params }: { params: { walletId: string } })
               <span className="ml-2 text-gray-600 dark:text-gray-300">{wallet.network}</span>
             </div>
             <div>
-              <span className="font-semibold text-gray-700 dark:text-gray-200">Addresses:</span>
-              <span className="ml-2 text-gray-600 dark:text-gray-300">{wallet.addresses}</span>
+              <span className="font-semibold text-gray-700 dark:text-gray-200">Default Address:</span>
+              <span className="ml-2 text-gray-600 dark:text-gray-300">{wallet.addresses.length > 0 && wallet.addresses[0]}</span>
             </div>
           </div>
         </div>

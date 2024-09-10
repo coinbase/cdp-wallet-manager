@@ -8,7 +8,7 @@ import { ArrowLeft } from 'lucide-react';
 export default function CreateWallet() {
   const [network, setNetwork] = useState('');
   const router = useRouter();
-  const networkOptions = ['Base Mainnet', 'Base Sepolia', 'Ethereum', 'Polygon'];
+  const networkOptions = ['Base Sepolia', 'Base Mainnet', 'Ethereum', 'Polygon'];
 
   const handleCreate = (e: React.FormEvent) => {
     e.preventDefault();
