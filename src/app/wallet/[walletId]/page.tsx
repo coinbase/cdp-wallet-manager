@@ -105,14 +105,21 @@ export default function WalletPage({ params }: { params: { walletId: string } })
             <thead>
               <tr className="bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-200 text-sm uppercase">
                 <th className="p-3 text-left font-semibold">Index</th>
-                <th className="p-3 text-left font-semibold">ID</th>
+                <th className="p-3 text-left font-semibold">Address</th>
               </tr>
             </thead>
             <tbody>
               {wallet.addresses.map((address, index) => (
-                <tr key={index} className={`border-b border-gray-200 dark:border-gray-700 ${index % 2 === 0 ? 'bg-gray-50 dark:bg-gray-800' : 'bg-white dark:bg-gray-900'}`}>
+                <tr key={index} className={`border-b border-gray-300 dark:border-gray-600 ${index % 2 === 0 ? 'bg-gray-50 dark:bg-gray-800' : 'bg-white dark:bg-gray-900'}`}>
                   <td className="p-3 font-medium text-gray-700 dark:text-gray-300">{index}</td>
-                  <td className="p-3 text-gray-600 dark:text-gray-300 break-all">{address}</td>
+                  <td className="p-3 text-gray-600 dark:text-gray-300 break-all">
+                    <Link 
+                      href={`/address/${address}`}
+                      className="text-primary hover:text-primary/80 hover:underline transition duration-300 ease-in-out"
+                    >
+                      {address}
+                    </Link>
+                  </td>
                 </tr>
               ))}
             </tbody>
