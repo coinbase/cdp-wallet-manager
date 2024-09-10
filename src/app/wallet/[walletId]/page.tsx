@@ -27,11 +27,11 @@ const walletBalances = {
   },
 };
 
-export default function WalletPage({ params }: { params: { id: string } }) {
+export default function WalletPage({ params }: { params: { walletId: string } }) {
   const [wallet, setWallet] = useState<any>(null);
 
   useEffect(() => {
-    const walletId = parseInt(params.id);
+    const walletId = parseInt(params.walletId);
     // In a real app, you'd fetch the wallet data from an API here
     const fetchedWallet = walletBalances[walletId as keyof typeof walletBalances] || {
       name: `New Wallet ${walletId}`,
@@ -40,7 +40,7 @@ export default function WalletPage({ params }: { params: { id: string } }) {
       balances: {}
     };
     setWallet(fetchedWallet);
-  }, [params.id]);
+  }, [params.walletId]);
 
   if (!wallet) {
     return <div>Loading...</div>;
@@ -59,7 +59,7 @@ export default function WalletPage({ params }: { params: { id: string } }) {
             <Wallet size={32} className="mr-3 text-primary" />
             {wallet.name}
           </h1>
-          <p className="text-gray-600 dark:text-gray-300 mb-4">Wallet ID: {params.id}</p>
+          <p className="text-gray-600 dark:text-gray-300 mb-4">Wallet ID: {params.walletId}</p>
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div>
               <span className="font-semibold text-gray-700 dark:text-gray-200">Network:</span>
