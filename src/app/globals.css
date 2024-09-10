@@ -48,3 +48,14 @@ a:hover {
     text-wrap: balance;
   }
 }
+
+@layer base {
+  select {
+    color: var(--foreground);
+    background-color: var(--background);
+  }
+
+  select option {
+    color: initial;
+  }
+}

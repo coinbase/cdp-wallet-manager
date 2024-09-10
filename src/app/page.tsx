@@ -14,10 +14,10 @@ export default function Home() {
       <main className="max-w-4xl mx-auto">
         <h1 className="text-4xl font-bold mb-8 text-gray-800 dark:text-gray-100">Wallet Manager</h1>
         
-        <button className="bg-primary hover:bg-primary/90 text-white px-6 py-3 rounded-lg shadow-md transition duration-300 ease-in-out flex items-center space-x-2 mb-8">
+        <Link href="/create-wallet" className="inline-block bg-primary hover:bg-primary/90 text-white px-6 py-3 rounded-lg shadow-md transition duration-300 ease-in-out flex items-center space-x-2 mb-8">
           <PlusCircle size={20} />
           <span>Create Wallet</span>
-        </button>
+        </Link>
         
         <h2 className="text-2xl font-semibold mb-4 text-gray-700 dark:text-gray-200">Your Wallets</h2>
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
