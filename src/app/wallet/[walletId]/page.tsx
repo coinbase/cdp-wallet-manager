@@ -5,54 +5,52 @@ import Link from "next/link";
 import { ArrowLeft, Wallet, ChevronLeft, ChevronRight } from "lucide-react";
 
 export type Wallet = {
+  id: string;
   name: string;
   network: string;
   addresses: string[];
   balances: Record<string, number>;
 };
 
-// Mock data for wallet balances (replace with actual data fetching logic later)
-const wallets: Record<number, Wallet> = {
-  1: {
-    name: "Main Wallet",
-    network: "Ethereum",
-    addresses: ["0x1234...5678", "0xabcd...efgh", "0x9876...5432"],
-    balances: Object.fromEntries(Array.from({ length: 50 }, (_, i) => [`Token${i + 1}`, Math.random() * 1000]))
-  },
-  2: {
-    name: "Savings Wallet",
-    network: "Bitcoin",
-    addresses: ["bc1qxy...zw3f0", "3J98t1...s4v8"],
-    balances: { BTC: 0.1, ETH: 1.5, USDT: 500 }
-  },
-  3: {
-    name: "Investment Wallet",
-    network: "Polygon",
-    addresses: ["0x2468...1357", "0xfedc...ba98", "0x1357...2468", "0xa1b2...c3d4", "0xe5f6...g7h8"],
-    balances: { BTC: 1.2, ETH: 5.0, USDT: 2000 }
-  },
-};
-
 const BALANCES_PER_PAGE_OPTIONS = [5, 10, 20, 50];
 
 export default function WalletPage({ params }: { params: { walletId: string } }) {
   const [wallet, setWallet] = useState<Wallet | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [balancesPerPage, setBalancesPerPage] = useState(BALANCES_PER_PAGE_OPTIONS[0]);
 
   useEffect(() => {
-    const walletId = parseInt(params.walletId);
-    const fetchedWallet = wallets[walletId as keyof typeof wallets] || {
-      name: `New Wallet ${walletId}`,
-      network: "Unknown",
-      addresses: [],
-      balances: {}
-    };
-    setWallet(fetchedWallet);
+    async function fetchWallet() {
+      try {
+        const response = await fetch(`/api/wallets/${params.walletId}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch wallet');
+        }
+        const data = await response.json();
+        setWallet(data);
+        setLoading(false);
+      } catch (err) {
+        console.error('Error fetching wallet:', err);
+        setError('Failed to load wallet. Please try again later.');
+        setLoading(false);
+      }
+    }
+
+    fetchWallet();
   }, [params.walletId]);
 
-  if (!wallet) {
+  if (loading) {
     return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
+
+  if (!wallet) {
+    return <div>Wallet not found</div>;
   }
 
   const totalBalancePages = Math.ceil(Object.keys(wallet.balances).length / balancesPerPage);

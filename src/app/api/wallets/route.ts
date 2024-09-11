@@ -11,7 +11,7 @@ export const coinbase = new Coinbase({
   privateKey: process.env.API_KEY_SECRET,
 });
 
-export interface WalletResponse {
+export interface WalletListResponse {
   id: string;
   name: string;
   network: string;
@@ -20,12 +20,12 @@ export interface WalletResponse {
 export async function GET() {
   try {
     const wallets = await Wallet.listWallets();
-    const walletResponse = wallets.map((wallet) => ({
+    const walletListResponse = wallets.map((wallet) => ({
       id: wallet.getId(),
       name: "My Wallet",
       network: formatNetworkId(wallet.getNetworkId()),
     }));
-    return NextResponse.json(walletResponse);
+    return NextResponse.json(walletListResponse);
   } catch (error) {
     console.error('Error fetching wallets:', error);
     return NextResponse.json({ error: 'Failed to fetch wallets' }, { status: 500 });

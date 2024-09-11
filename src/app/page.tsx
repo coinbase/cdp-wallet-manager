@@ -3,14 +3,14 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { PlusCircle, ChevronLeft, ChevronRight } from "lucide-react";
-import { WalletResponse } from "./api/wallets/route";
+import { WalletListResponse } from "./api/wallets/route";
 import React from 'react';
 
 const WALLETS_PER_PAGE_OPTIONS = [10, 20, 50, 100];
 const CACHE_DURATION = 6 * 60 * 60 * 1000; // 6 hours in milliseconds
 
 export default function Home() {
-  const [wallets, setWallets] = useState<WalletResponse[]>([]);
+  const [wallets, setWallets] = useState<WalletListResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
