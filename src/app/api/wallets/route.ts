@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { Coinbase, Wallet } from '@coinbase/coinbase-sdk';
-
+import { formatNetworkId } from '@/utils/stringUtils';
 
 if (!process.env.API_KEY_NAME || !process.env.API_KEY_SECRET) {
   throw new Error("API_KEY_NAME and API_KEY_SECRET must be set");
@@ -23,7 +23,7 @@ export async function GET() {
     const walletResponse = wallets.map((wallet) => ({
       id: wallet.getId(),
       name: "My Wallet",
-      network: wallet.getNetworkId().split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' '),
+      network: formatNetworkId(wallet.getNetworkId()),
     }));
     return NextResponse.json(walletResponse);
   } catch (error) {

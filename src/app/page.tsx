@@ -7,6 +7,7 @@ import { WalletResponse } from "./api/wallets/route";
 import React from 'react';
 
 const WALLETS_PER_PAGE_OPTIONS = [10, 20, 50, 100];
+const CACHE_DURATION = 6 * 60 * 60 * 1000; // 6 hours in milliseconds
 
 export default function Home() {
   const [wallets, setWallets] = useState<WalletResponse[]>([]);
@@ -18,6 +19,20 @@ export default function Home() {
   useEffect(() => {
     async function fetchWallets() {
       try {
+        const cachedData = localStorage.getItem('walletsData');
+        const cachedTimestamp = localStorage.getItem('walletsTimestamp');
+        
+        if (cachedData && cachedTimestamp) {
+          const parsedData = JSON.parse(cachedData);
+          const timestamp = parseInt(cachedTimestamp, 10);
+          
+          if (Date.now() - timestamp < CACHE_DURATION) {
+            setWallets(parsedData);
+            setLoading(false);
+            return;
+          }
+        }
+
         const response = await fetch('/api/wallets');
         if (!response.ok) {
           throw new Error('Failed to fetch wallets');
@@ -25,7 +40,9 @@ export default function Home() {
         const data = await response.json();
         setWallets(data);
         setLoading(false);
-        console.log(data);
+        
+        localStorage.setItem('walletsData', JSON.stringify(data));
+        localStorage.setItem('walletsTimestamp', Date.now().toString());
       } catch (err) {
         console.error('Error fetching wallets:', err);
         setError('Failed to load wallets. Please try again later.');
