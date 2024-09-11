@@ -1,27 +1,45 @@
 'use client'
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { PlusCircle, ChevronLeft, ChevronRight } from "lucide-react";
-
-// Mock data for wallets (replace with actual data fetching logic later)
-const allWallets = Array.from({ length: 125 }, (_, i) => ({
-  id: i + 1,
-  name: `Wallet ${i + 1}`,
-  network: ["Ethereum", "Bitcoin", "Polygon"][i % 3],
-  addresses: Math.floor(Math.random() * 5) + 1
-}));
+import { WalletResponse } from "./api/wallets/route";
+import React from 'react';
 
 const WALLETS_PER_PAGE_OPTIONS = [10, 20, 50, 100];
 
 export default function Home() {
+  const [wallets, setWallets] = useState<WalletResponse[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [walletsPerPage, setWalletsPerPage] = useState(WALLETS_PER_PAGE_OPTIONS[0]);
 
-  const totalPages = Math.ceil(allWallets.length / walletsPerPage);
+  useEffect(() => {
+    async function fetchWallets() {
+      try {
+        const response = await fetch('/api/wallets');
+        if (!response.ok) {
+          throw new Error('Failed to fetch wallets');
+        }
+        const data = await response.json();
+        setWallets(data);
+        setLoading(false);
+        console.log(data);
+      } catch (err) {
+        console.error('Error fetching wallets:', err);
+        setError('Failed to load wallets. Please try again later.');
+        setLoading(false);
+      }
+    }
+
+    fetchWallets();
+  }, []);
+
+  const totalPages = Math.ceil(wallets.length / walletsPerPage);
   const startIndex = (currentPage - 1) * walletsPerPage;
   const endIndex = startIndex + walletsPerPage;
-  const currentWallets = allWallets.slice(startIndex, endIndex);
+  const currentWallets = wallets.slice(startIndex, endIndex);
 
   const goToPage = (page: number) => {
     setCurrentPage(page);
@@ -30,8 +48,16 @@ export default function Home() {
   const handleWalletsPerPageChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const newWalletsPerPage = parseInt(event.target.value, 10);
     setWalletsPerPage(newWalletsPerPage);
-    setCurrentPage(1); // Reset to first page when changing items per page
+    setCurrentPage(1);
   };
+
+  if (loading) {
+    return <div>Loading wallets...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 p-8 font-sans">
@@ -62,7 +88,7 @@ export default function Home() {
           </div>
         </div>
         
-        <h2 className="text-2xl font-semibold mb-4 text-gray-700 dark:text-gray-200">Your Wallets</h2>
+        <h2 className="text-2xl font-semibold mb-4 text-gray-700 dark:text-gray-200">Wallets</h2>
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden mb-6">
           <table className="w-full border-collapse">
             <thead>
@@ -70,20 +96,18 @@ export default function Home() {
                 <th className="p-3 text-left font-semibold">Wallet ID</th>
                 <th className="p-3 text-left font-semibold">Name</th>
                 <th className="p-3 text-left font-semibold">Network</th>
-                <th className="p-3 text-left font-semibold">Addresses</th>
               </tr>
             </thead>
             <tbody>
-              {currentWallets.map((wallet, index) => (
-                <tr key={wallet.id} className={`border-b border-gray-300 dark:border-gray-600 ${index % 2 === 0 ? 'bg-gray-50 dark:bg-gray-800' : 'bg-white dark:bg-gray-900'}`}>
-                  <td className="p-3 text-gray-600 dark:text-gray-300">{wallet.id}</td>
+              {currentWallets.map((wallet) => (
+                <tr key={wallet.id} className="border-b border-gray-300 dark:border-gray-600">
                   <td className="p-3">
                     <Link href={`/wallet/${wallet.id}`} className="text-primary hover:text-primary/80 font-medium">
-                      {wallet.name}
+                      {wallet.id}
                     </Link>
                   </td>
+                  <td className="p-3 text-gray-600 dark:text-gray-300">{wallet.name}</td>
                   <td className="p-3 text-gray-600 dark:text-gray-300">{wallet.network}</td>
-                  <td className="p-3 text-gray-600 dark:text-gray-300">{wallet.addresses}</td>
                 </tr>
               ))}
             </tbody>
@@ -99,19 +123,33 @@ export default function Home() {
           >
             <ChevronLeft size={20} />
           </button>
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-            <button
-              key={page}
-              onClick={() => goToPage(page)}
-              className={`px-3 py-1 rounded-md ${
-                currentPage === page
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300'
-              }`}
-            >
-              {page}
-            </button>
-          ))}
+          
+          {Array.from({ length: totalPages }, (_, i) => i + 1)
+            .filter(page => {
+              if (totalPages <= 10) return true;
+              if (page === 1 || page === totalPages) return true;
+              if (page >= currentPage - 2 && page <= currentPage + 2) return true;
+              if (page === 2 || page === totalPages - 1) return true;
+              return false;
+            })
+            .map((page, index, array) => (
+              <React.Fragment key={page}>
+                {index > 0 && array[index - 1] !== page - 1 && (
+                  <span className="px-2 text-gray-400">...</span>
+                )}
+                <button
+                  onClick={() => goToPage(page)}
+                  className={`px-3 py-1 rounded-md ${
+                    currentPage === page
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300'
+                  }`}
+                >
+                  {page}
+                </button>
+              </React.Fragment>
+            ))}
+          
           <button
             onClick={() => goToPage(currentPage + 1)}
             disabled={currentPage === totalPages}
