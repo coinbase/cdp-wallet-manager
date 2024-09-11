@@ -2,8 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from "next/link";
-import { ArrowLeft, Wallet } from "lucide-react";
-
+import { ArrowLeft, Wallet, ChevronLeft, ChevronRight } from "lucide-react";
 
 export type Wallet = {
   name: string;
@@ -18,7 +17,7 @@ const wallets: Record<number, Wallet> = {
     name: "Main Wallet",
     network: "Ethereum",
     addresses: ["0x1234...5678", "0xabcd...efgh", "0x9876...5432"],
-    balances: { BTC: 0.5, ETH: 2.3, USDT: 1000 }
+    balances: Object.fromEntries(Array.from({ length: 50 }, (_, i) => [`Token${i + 1}`, Math.random() * 1000]))
   },
   2: {
     name: "Savings Wallet",
@@ -34,12 +33,15 @@ const wallets: Record<number, Wallet> = {
   },
 };
 
+const BALANCES_PER_PAGE_OPTIONS = [5, 10, 20, 50];
+
 export default function WalletPage({ params }: { params: { walletId: string } }) {
   const [wallet, setWallet] = useState<Wallet | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [balancesPerPage, setBalancesPerPage] = useState(BALANCES_PER_PAGE_OPTIONS[0]);
 
   useEffect(() => {
     const walletId = parseInt(params.walletId);
-    // In a real app, you'd fetch the wallet data from an API here
     const fetchedWallet = wallets[walletId as keyof typeof wallets] || {
       name: `New Wallet ${walletId}`,
       network: "Unknown",
@@ -52,6 +54,21 @@ export default function WalletPage({ params }: { params: { walletId: string } })
   if (!wallet) {
     return <div>Loading...</div>;
   }
+
+  const totalBalancePages = Math.ceil(Object.keys(wallet.balances).length / balancesPerPage);
+  const startIndex = (currentPage - 1) * balancesPerPage;
+  const endIndex = startIndex + balancesPerPage;
+  const currentBalances = Object.entries(wallet.balances).slice(startIndex, endIndex);
+
+  const goToPage = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handleBalancesPerPageChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const newBalancesPerPage = parseInt(event.target.value, 10);
+    setBalancesPerPage(newBalancesPerPage);
+    setCurrentPage(1);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 p-8 font-sans">
@@ -79,8 +96,23 @@ export default function WalletPage({ params }: { params: { walletId: string } })
           </div>
         </div>
         
-        <h2 className="text-2xl font-semibold mb-4 text-gray-700 dark:text-gray-200">Balances</h2>
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-2xl font-semibold text-gray-700 dark:text-gray-200">Balances</h2>
+          <div className="flex items-center space-x-2">
+            <label htmlFor="balancesPerPage" className="text-gray-700 dark:text-gray-300">Items per page:</label>
+            <select
+              id="balancesPerPage"
+              value={balancesPerPage}
+              onChange={handleBalancesPerPageChange}
+              className="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-md px-2 py-1"
+            >
+              {BALANCES_PER_PAGE_OPTIONS.map(option => (
+                <option key={option} value={option}>{option}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden mb-6">
           <table className="w-full border-collapse">
             <thead>
               <tr className="bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-200 text-sm uppercase">
@@ -89,14 +121,45 @@ export default function WalletPage({ params }: { params: { walletId: string } })
               </tr>
             </thead>
             <tbody>
-              {Object.entries(wallet.balances).map(([currency, amount], index) => (
-                <tr key={currency} className={`border-b border-gray-200 dark:border-gray-700 ${index % 2 === 0 ? 'bg-gray-50 dark:bg-gray-800' : 'bg-white dark:bg-gray-900'}`}>
+              {currentBalances.map(([currency, amount], index) => (
+                <tr key={currency} className={`border-b border-gray-300 dark:border-gray-600 ${index % 2 === 0 ? 'bg-gray-50 dark:bg-gray-800' : 'bg-white dark:bg-gray-900'}`}>
                   <td className="p-3 font-medium text-gray-700 dark:text-gray-300">{currency}</td>
-                  <td className="p-3 text-gray-600 dark:text-gray-300">{amount.toString()}</td>
+                  <td className="p-3 text-gray-600 dark:text-gray-300">{amount.toFixed(4)}</td>
                 </tr>
               ))}
             </tbody>
           </table>
+        </div>
+
+        {/* Balances Pagination */}
+        <div className="flex justify-center items-center space-x-2 mb-8">
+          <button
+            onClick={() => goToPage(currentPage - 1)}
+            disabled={currentPage === 1}
+            className="p-2 rounded-md bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 disabled:opacity-50"
+          >
+            <ChevronLeft size={20} />
+          </button>
+          {Array.from({ length: totalBalancePages }, (_, i) => i + 1).map((page) => (
+            <button
+              key={page}
+              onClick={() => goToPage(page)}
+              className={`px-3 py-1 rounded-md ${
+                currentPage === page
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300'
+              }`}
+            >
+              {page}
+            </button>
+          ))}
+          <button
+            onClick={() => goToPage(currentPage + 1)}
+            disabled={currentPage === totalBalancePages}
+            className="p-2 rounded-md bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 disabled:opacity-50"
+          >
+            <ChevronRight size={20} />
+          </button>
         </div>
         
         <h2 className="text-2xl font-semibold mb-4 mt-8 text-gray-700 dark:text-gray-200">Addresses</h2>
