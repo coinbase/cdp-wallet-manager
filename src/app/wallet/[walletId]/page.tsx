@@ -55,9 +55,6 @@ export default function WalletPage({ params }: { params: { walletId: string } })
   }
 
   const totalBalancePages = Math.ceil(Object.keys(wallet.balances).length / balancesPerPage);
-  const startIndex = (currentPage - 1) * balancesPerPage;
-  const endIndex = startIndex + balancesPerPage;
-  const currentBalances = Object.entries(wallet.balances).slice(startIndex, endIndex);
 
   const goToPage = (page: number) => {
     setCurrentPage(page);
@@ -121,10 +118,10 @@ export default function WalletPage({ params }: { params: { walletId: string } })
               </tr>
             </thead>
             <tbody>
-              {currentBalances.map(([currency, amount], index) => (
+              {Object.entries(wallet.balances).map(([currency, amount], index) => (
                 <tr key={currency} className={`border-b border-gray-300 dark:border-gray-600 ${index % 2 === 0 ? 'bg-gray-50 dark:bg-gray-800' : 'bg-white dark:bg-gray-900'}`}>
                   <td className="p-3 font-medium text-gray-700 dark:text-gray-300">{currency}</td>
-                  <td className="p-3 text-gray-600 dark:text-gray-300">{amount.toFixed(4)}</td>
+                  <td className="p-3 text-gray-600 dark:text-gray-300">{amount}</td>
                 </tr>
               ))}
             </tbody>

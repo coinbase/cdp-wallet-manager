@@ -13,7 +13,6 @@ Coinbase.configure({
 
 export interface WalletResponse {
   id: string;
-  name: string;
   network: string;
   addresses: string[];
   defaultAddress: string | null;
@@ -30,13 +29,19 @@ export async function GET(request: Request, { params }: { params: { id: string }
     const defaultAddress = await wallet.getDefaultAddress();
     const defaultAddressId = defaultAddress ? defaultAddress.getId() : null;
     
+    // Fetch balances
+    const balances = await wallet.listBalances();
+    const formattedBalances: Record<string, number> = {};
+    balances.forEach((balance, currency) => {
+      formattedBalances[currency] = parseFloat(balance.toString());
+    });
+
     walletResponse = {
       id: wallet.getId() as string,
-      name: "My Wallet",
       network: formatNetworkId(wallet.getNetworkId()),
       addresses: addressIds,
       defaultAddress: defaultAddressId,
-      balances: {},
+      balances: formattedBalances,
     };
 
     return NextResponse.json(walletResponse);
