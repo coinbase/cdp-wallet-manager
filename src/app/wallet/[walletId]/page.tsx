@@ -77,19 +77,20 @@ export default function WalletPage({ params }: { params: { walletId: string } })
         </Link>
         
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-8">
-          <h1 className="text-3xl font-bold mb-2 text-gray-800 dark:text-gray-100 flex items-center">
+          <h1 className="text-3xl font-bold mb-6 text-gray-800 dark:text-gray-100 flex items-center">
             <Wallet size={32} className="mr-3 text-primary" />
-            {wallet.name}
+            Wallet {params.walletId}
           </h1>
-          <p className="text-gray-600 dark:text-gray-300 mb-4">Wallet ID: {params.walletId}</p>
-          <div className="grid grid-cols-2 gap-4 text-sm">
-            <div>
+          <div className="flex flex-col sm:flex-row gap-4 text-sm">
+            <div className="flex-1">
               <span className="font-semibold text-gray-700 dark:text-gray-200">Network:</span>
               <span className="ml-2 text-gray-600 dark:text-gray-300">{wallet.network}</span>
             </div>
-            <div>
-              <span className="font-semibold text-gray-700 dark:text-gray-200">Default Address:</span>
-              <span className="ml-2 text-gray-600 dark:text-gray-300">{wallet.addresses.length > 0 && wallet.addresses[0]}</span>
+            <div className="flex-1">
+              <div className="font-semibold text-gray-700 dark:text-gray-200">Default Address:</div>
+              <div className="text-gray-600 dark:text-gray-300 break-all mt-1">
+                {wallet.addresses.length > 0 && wallet.addresses[0]}
+              </div>
             </div>
           </div>
         </div>

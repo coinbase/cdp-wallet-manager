@@ -111,7 +111,6 @@ export default function Home() {
             <thead>
               <tr className="bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-200 text-sm uppercase">
                 <th className="p-3 text-left font-semibold">Wallet ID</th>
-                <th className="p-3 text-left font-semibold">Name</th>
                 <th className="p-3 text-left font-semibold">Network</th>
               </tr>
             </thead>
@@ -123,7 +122,6 @@ export default function Home() {
                       {wallet.id}
                     </Link>
                   </td>
-                  <td className="p-3 text-gray-600 dark:text-gray-300">{wallet.name}</td>
                   <td className="p-3 text-gray-600 dark:text-gray-300">{wallet.network}</td>
                 </tr>
               ))}
