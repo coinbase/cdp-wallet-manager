@@ -16,24 +16,26 @@ export interface WalletResponse {
   name: string;
   network: string;
   addresses: string[];
-  defaultAddress: string;
+  defaultAddress: string | null;
   balances: Record<string, number>;
 } 
 
 export async function GET(request: Request, { params }: { params: { id: string } }) {
+  let walletResponse: WalletResponse;
   try {
     const walletId = params.id;
     const wallet = await Wallet.fetch(walletId);
     const addresses = await wallet.listAddresses();
     const addressIds = await Promise.all(addresses.map(async (address) => address.getId()));
     const defaultAddress = await wallet.getDefaultAddress();
+    const defaultAddressId = defaultAddress ? defaultAddress.getId() : null;
     
-    const walletResponse: WalletResponse = {
+    walletResponse = {
       id: wallet.getId() as string,
       name: "My Wallet",
       network: formatNetworkId(wallet.getNetworkId()),
       addresses: addressIds,
-      defaultAddress: defaultAddress.getId() as string,
+      defaultAddress: defaultAddressId,
       balances: {},
     };
 

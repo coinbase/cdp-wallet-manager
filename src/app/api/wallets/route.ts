@@ -19,8 +19,20 @@ export interface WalletListResponse {
 
 export async function GET() {
   try {
-    const wallets = await Wallet.listWallets();
-    const walletListResponse = wallets.map((wallet) => ({
+    const allWallets = await Wallet.listWallets();
+    const wallets = await Promise.all(
+      allWallets.map(async (wallet) => {
+        try {
+          await wallet.getDefaultAddress();
+          return wallet;
+        } catch (error) {
+          console.error(`Error fetching default address for wallet ${wallet.getId()}:`, error);
+          return null;
+        }
+      })
+    );
+    const filteredWallets = wallets.filter((wallet): wallet is Wallet => wallet !== null);
+    const walletListResponse = filteredWallets.map((wallet) => ({
       id: wallet.getId(),
       name: "My Wallet",
       network: formatNetworkId(wallet.getNetworkId()),
