@@ -174,7 +174,7 @@ export default function WalletPage({ params }: { params: { walletId: string } })
                   <td className="p-3 font-medium text-gray-700 dark:text-gray-300">{index}</td>
                   <td className="p-3 text-gray-600 dark:text-gray-300 break-all">
                     <Link 
-                      href={`/address/${address}`}
+                      href={`/wallets/${wallet.id}/addresses/${address}`}
                       className="text-primary hover:text-primary/80 hover:underline transition duration-300 ease-in-out"
                     >
                       {address}

@@ -19,10 +19,10 @@ export interface WalletResponse {
   balances: Record<string, number>;
 } 
 
-export async function GET(request: Request, { params }: { params: { id: string } }) {
+export async function GET(request: Request, { params }: { params: { walletId: string } }) {
   let walletResponse: WalletResponse;
   try {
-    const walletId = params.id;
+    const walletId = params.walletId;
     const wallet = await Wallet.fetch(walletId);
     const addresses = await wallet.listAddresses();
     const addressIds = await Promise.all(addresses.map(async (address) => address.getId()));

@@ -118,7 +118,7 @@ export default function Home() {
               {currentWallets.map((wallet) => (
                 <tr key={wallet.id} className="border-b border-gray-300 dark:border-gray-600">
                   <td className="p-3">
-                    <Link href={`/wallet/${wallet.id}`} className="text-primary hover:text-primary/80 font-medium">
+                    <Link href={`/wallets/${wallet.id}`} className="text-primary hover:text-primary/80 font-medium">
                       {wallet.id}
                     </Link>
                   </td>

@@ -3,61 +3,44 @@
 import { useEffect, useState } from 'react';
 import Link from "next/link";
 import { ArrowLeft, CreditCard, ChevronLeft, ChevronRight } from "lucide-react";
-
-export type Address = {
-  id: string;
-  walletId: number;
-  network: string;
-  balances: Record<string, number>;
-  transactions: number;
-};
-
-// Mock data for address details (replace with actual data fetching logic later)
-const addresses: Record<string, Address> = {
-  "0x1234...5678": {
-    id: "0x1234...5678",
-    walletId: 1,
-    network: "Ethereum",
-    balances: Object.fromEntries(Array.from({ length: 50 }, (_, i) => [`Token${i + 1}`, Math.random() * 1000])),
-    transactions: 25
-  },
-  "bc1qxy...zw3f0": {
-    id: "bc1qxy...zw3f0",
-    walletId: 2,
-    network: "Bitcoin",
-    balances: { BTC: 0.05 },
-    transactions: 10
-  },
-  "0x2468...1357": {
-    id: "0x2468...1357",
-    walletId: 3,
-    network: "Polygon",
-    balances: { MATIC: 100, USDC: 200 },
-    transactions: 50
-  },
-};
+import { AddressResponse } from '@/app/api/wallets/[walletId]/addresses/[addressId]/route';
 
 const BALANCES_PER_PAGE_OPTIONS = [5, 10, 20, 50];
 
-export default function AddressPage({ params }: { params: { addressId: string } }) {
-  const [address, setAddress] = useState<Address | null>(null);
+export default function AddressPage({ params }: { params: { walletId: string, addressId: string } }) {
+  const [address, setAddress] = useState<AddressResponse | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [balancesPerPage, setBalancesPerPage] = useState(BALANCES_PER_PAGE_OPTIONS[0]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // In a real app, you'd fetch the address data from an API here
-    const fetchedAddress = addresses[params.addressId] || {
-      id: params.addressId,
-      walletId: 0,
-      network: "Unknown",
-      balances: {},
-      transactions: 0
+    const fetchAddress = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(`/api/wallets/${params.walletId}/addresses/${params.addressId}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch address data');
+        }
+        const data: AddressResponse = await response.json();
+        setAddress(data);
+      } catch (err) {
+        setError('Error fetching address data');
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
     };
-    setAddress(fetchedAddress);
-  }, [params.addressId]);
 
-  if (!address) {
+    fetchAddress();
+  }, [params.walletId, params.addressId]);
+
+  if (loading) {
     return <div>Loading...</div>;
+  }
+
+  if (error || !address) {
+    return <div>Error: {error || 'Address not found'}</div>;
   }
 
   const totalBalancePages = Math.ceil(Object.keys(address.balances).length / balancesPerPage);
@@ -98,10 +81,6 @@ export default function AddressPage({ params }: { params: { addressId: string } 
               <span className="font-semibold text-gray-700 dark:text-gray-200">Wallet ID:</span>
               <span className="ml-2 text-gray-600 dark:text-gray-300">{address.walletId}</span>
             </div>
-            <div>
-              <span className="font-semibold text-gray-700 dark:text-gray-200">Total Transactions:</span>
-              <span className="ml-2 text-gray-600 dark:text-gray-300">{address.transactions}</span>
-            </div>
           </div>
         </div>
         
@@ -133,7 +112,7 @@ export default function AddressPage({ params }: { params: { addressId: string } 
               {currentBalances.map(([currency, amount], index) => (
                 <tr key={currency} className={`border-b border-gray-300 dark:border-gray-600 ${index % 2 === 0 ? 'bg-gray-50 dark:bg-gray-800' : 'bg-white dark:bg-gray-900'}`}>
                   <td className="p-3 font-medium text-gray-700 dark:text-gray-300">{currency}</td>
-                  <td className="p-3 text-gray-600 dark:text-gray-300">{amount.toFixed(4)}</td>
+                  <td className="p-3 text-gray-600 dark:text-gray-300">{amount}</td>
                 </tr>
               ))}
             </tbody>
