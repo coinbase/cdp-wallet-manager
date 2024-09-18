@@ -6,7 +6,7 @@ if (!process.env.API_KEY_NAME || !process.env.API_KEY_SECRET) {
   throw new Error("API_KEY_NAME and API_KEY_SECRET must be set");
 }
 
-export const coinbase = new Coinbase({
+Coinbase.configure({
   apiKeyName: process.env.API_KEY_NAME,
   privateKey: process.env.API_KEY_SECRET,
 });
