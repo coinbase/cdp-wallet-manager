@@ -10,6 +10,7 @@ export type Wallet = {
   network: string;
   addresses: string[];
   balances: Record<string, number>;
+  defaultAddress: string | null;
 };
 
 const BALANCES_PER_PAGE_OPTIONS = [5, 10, 20, 50];
@@ -89,7 +90,7 @@ export default function WalletPage({ params }: { params: { walletId: string } })
             <div className="flex-1">
               <div className="font-semibold text-gray-700 dark:text-gray-200">Default Address:</div>
               <div className="text-gray-600 dark:text-gray-300 break-all mt-1">
-                {wallet.addresses.length > 0 && wallet.addresses[0]}
+                {wallet.addresses.length > 0 && wallet.defaultAddress ? wallet.defaultAddress : 'N/A'}
               </div>
             </div>
           </div>
@@ -179,7 +180,7 @@ export default function WalletPage({ params }: { params: { walletId: string } })
                       href={`/address/${address}`}
                       className="text-primary hover:text-primary/80 hover:underline transition duration-300 ease-in-out"
                     >
-                      {address}
+                      {address} {address === wallet.defaultAddress ? " (default)" : ""}
                     </Link>
                   </td>
                 </tr>
