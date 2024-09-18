@@ -177,8 +177,9 @@ export default function WalletPage({ params }: { params: { walletId: string } })
                       href={`/address/${address}`}
                       className="text-primary hover:text-primary/80 hover:underline transition duration-300 ease-in-out"
                     >
-                      {address} {address === wallet.defaultAddress ? " (default)" : ""}
+                      {address}
                     </Link>
+                    {address === wallet.defaultAddress && " (default)"}
                   </td>
                 </tr>
               ))}
