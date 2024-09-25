@@ -36,7 +36,14 @@ export default function AddressPage({ params }: { params: { walletId: string, ad
   }, [params.walletId, params.addressId]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="fixed inset-0 bg-gray-100/75 dark:bg-gray-900/75 flex justify-center items-center z-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-24 w-24 border-t-4 border-b-4 border-blue-600 dark:border-blue-400 mx-auto"></div>
+          <p className="mt-4 text-xl font-semibold text-gray-800 dark:text-gray-200">Loading address...</p>
+        </div>
+      </div>
+    );
   }
 
   if (error || !address) {
