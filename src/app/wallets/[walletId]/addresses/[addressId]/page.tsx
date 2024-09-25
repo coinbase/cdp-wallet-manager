@@ -68,7 +68,7 @@ export default function AddressPage({ params }: { params: { walletId: string, ad
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 p-8 font-sans">
       <main className="max-w-4xl mx-auto">
-        <Link href={`/wallet/${address.walletId}`} className="inline-flex items-center text-primary hover:text-primary/80 mb-8 transition duration-300 ease-in-out">
+        <Link href={`/wallets/${address.walletId}`} className="inline-flex items-center text-primary hover:text-primary/80 mb-8 transition duration-300 ease-in-out">
           <ArrowLeft size={20} className="mr-2" />
           <span>Back to Wallet</span>
         </Link>

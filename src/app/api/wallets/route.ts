@@ -1,15 +1,7 @@
 import { NextResponse } from 'next/server';
-import { Coinbase, Wallet } from '@coinbase/coinbase-sdk';
+import { Wallet } from '@coinbase/coinbase-sdk';
 import { formatNetworkId } from '@/utils/stringUtils';
-
-if (!process.env.API_KEY_NAME || !process.env.API_KEY_SECRET) {
-  throw new Error("API_KEY_NAME and API_KEY_SECRET must be set");
-}
-
-Coinbase.configure({
-  apiKeyName: process.env.API_KEY_NAME,
-  privateKey: process.env.API_KEY_SECRET,
-});
+import  '@/lib/server/coinbase';
 
 export interface WalletListResponse {
   id: string;

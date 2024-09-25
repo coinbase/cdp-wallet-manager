@@ -1,5 +1,5 @@
 {
-  "name": "wallet-manager",
+  "name": "cdp-wallet-manager",
   "version": "0.1.0",
   "private": true,
   "scripts": {
