@@ -14,8 +14,8 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Wallet Manager App",
-  description: "Manage your crypto wallets with ease",
+  title: "CDP Wallet Manager",
+  description: "Manage your CDP wallets with ease",
 };
 
 export default function RootLayout({

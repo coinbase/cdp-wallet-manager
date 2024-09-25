@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { PlusCircle, ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { WalletListResponse } from "./api/wallets/route";
 import React from 'react';
 
@@ -79,17 +79,9 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 p-8 font-sans">
       <main className="max-w-4xl mx-auto">
-        <h1 className="text-4xl font-bold mb-8 text-gray-800 dark:text-gray-100">Wallet Manager</h1>
+        <h1 className="text-4xl font-bold mb-8 text-gray-800 dark:text-gray-100">CDP Wallet Manager</h1>
         
-        <div className="flex justify-between items-center mb-8">
-          <Link 
-            href="/create-wallet" 
-            className="inline-flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg shadow-md transition duration-300 ease-in-out"
-          >
-            <PlusCircle size={20} />
-            <span>Create Wallet</span>
-          </Link>
-          
+        <div className="flex justify-end items-center mb-8">
           <div className="flex items-center space-x-2">
             <label htmlFor="walletsPerPage" className="text-gray-700 dark:text-gray-300">Wallets per page:</label>
             <select
