@@ -22,14 +22,6 @@ export default function WalletPage({ params }: { params: { walletId: string } })
   const [currentPage, setCurrentPage] = useState(1);
   const [balancesPerPage, setBalancesPerPage] = useState(BALANCES_PER_PAGE_OPTIONS[0]);
 
-  const [destinationAddress, setDestinationAddress] = useState('');
-  const [amount, setAmount] = useState('');
-  const [asset, setAsset] = useState('');
-  const [transferLoading, setTransferLoading] = useState(false);
-  const [transferError, setTransferError] = useState('');
-  const [transferSuccess, setTransferSuccess] = useState('');
-
-
   useEffect(() => {
     async function fetchWallet() {
       try {
@@ -79,49 +71,6 @@ export default function WalletPage({ params }: { params: { walletId: string } })
     const newBalancesPerPage = parseInt(event.target.value, 10);
     setBalancesPerPage(newBalancesPerPage);
     setCurrentPage(1);
-  };
-
-
-  const handleCreateTransfer = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    console.log('Transfer form submitted');
-    setTransferLoading(true);
-    setTransferError('');
-    setTransferSuccess('');
-
-    try {
-      console.log('Creating transfer:', { destinationAddress, amount, asset }); 
-      const response = await fetch('/api/wallets', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          destination_address: destinationAddress,
-          amount,
-          asset: asset,
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to create transfer');
-      }
-
-      const data = await response.json();
-      console.log('Transfer created:', data);
-      setTransferSuccess('Transfer request created successfully!');
-      
-      // Reset form
-      setDestinationAddress('');
-      setAmount('');
-      setAsset('');
-    } catch (err) {
-      console.error('Error creating transfer:', err); // Debugging log
-      setTransferError(err.message);
-    } finally {
-      setTransferLoading(false);
-    }
   };
 
   return (
@@ -243,75 +192,6 @@ export default function WalletPage({ params }: { params: { walletId: string } })
               ))}
             </tbody>
           </table>
-        </div>
-        {/* Create Transfer */}
-        <div className="bg-white shadow-md rounded-lg p-6">
-          <h2 className="text-2xl font-semibold text-gray-800 mb-6">Create Transfer</h2>
-          <form onSubmit={handleCreateTransfer} className="space-y-4">
-            <div>
-              <label htmlFor="destinationAddress" className="block text-sm font-medium text-gray-700 mb-1">
-                Destination Address
-              </label>
-              <input
-                type="text"
-                id="destinationAddress"
-                value={destinationAddress}
-                onChange={(e) => setDestinationAddress(e.target.value)}
-                required
-                className="block w-full rounded-md border-gray-300 pl-3 pr-10 py-2 text-base focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-gray-900"
-                placeholder="0x..."
-              />
-            </div>
-            <div>
-              <label htmlFor="amount" className="block text-sm font-medium text-gray-700 mb-1">
-                Amount
-              </label>
-              <input
-                type="number"
-                id="amount"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                required
-                min="0"
-                step="any"
-                className="block w-full rounded-md border-gray-300 pl-3 pr-10 py-2 text-base focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-gray-900"
-                placeholder="0.00"
-              />
-            </div>
-            <div>
-              <label htmlFor="asset" className="block text-sm font-medium text-gray-700 mb-1">
-                Asset
-              </label>
-              <input
-                type="text"
-                id="asset"
-                value={asset}
-                onChange={(e) => setAsset(e.target.value)}
-                required
-                className="block w-full rounded-md border-gray-300 pl-3 pr-10 py-2 text-base focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-gray-900"
-                placeholder="ETH, USDC, etc."
-              />
-            </div>
-            <button
-              type="submit"
-              disabled={transferLoading || !destinationAddress || !amount || !asset}
-              className="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors duration-200"
-            >
-              {transferLoading ? (
-                <>
-                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  Creating Transfer...
-                </>
-              ) : (
-                'Create Transfer'
-              )}
-            </button>
-          </form>
-          {transferError && <p className="mt-2 text-red-600">{transferError}</p>}
-          {transferSuccess && <p className="mt-2 text-green-600">{transferSuccess}</p>}
         </div>
       </main>
     </div>

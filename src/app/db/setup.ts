@@ -1,8 +1,9 @@
-const { Pool } = require('pg');
-const fs = require('fs');
-const path = require('path');
+import { Pool } from 'pg';
+import fs from 'fs';
+import path from 'path';
+import dotenv from 'dotenv';
 
-require('dotenv').config({ path: '.env' });
+dotenv.config({ path: '.env' });
 
 const pool = new Pool({
   connectionString: process.env.POSTGRES_URL

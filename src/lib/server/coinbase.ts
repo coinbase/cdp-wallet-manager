@@ -13,5 +13,3 @@ Coinbase.configure({
     privateKey: apiKeyString.replaceAll("\\n", "\n") as string,
 });
 
-
-console.log('Coinbase configured');

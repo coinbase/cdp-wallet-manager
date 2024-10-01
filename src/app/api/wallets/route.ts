@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { Coinbase, Wallet } from '@coinbase/coinbase-sdk';
+import { Wallet } from '@coinbase/coinbase-sdk';
 import { formatNetworkId } from '@/utils/stringUtils';
 import  '@/lib/server/coinbase';
 import {addSeedRecord} from "@/app/db/db";
@@ -12,6 +12,7 @@ export interface WalletListResponse {
 } 
 
 export async function GET() {
+  console.log("Fetching wallets")
   try {
     const allWallets = await Wallet.listWallets();
     const wallets = await Promise.all(

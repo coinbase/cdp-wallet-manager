@@ -8,7 +8,6 @@ import React from 'react';
 import { useRouter } from 'next/navigation';
 
 const WALLETS_PER_PAGE_OPTIONS = [10, 20, 50, 100];
-const CACHE_DURATION = 6 * 60 * 60 * 1000; // 6 hours in milliseconds
 // TODO: Load this from CDP SDK.
 const SUPPORTED_NETWORKS = ['base-sepolia', 'base-mainnet'];
 
@@ -19,25 +18,24 @@ export default function Home() {
   const [currentPage, setCurrentPage] = useState(1);
   const [walletsPerPage, setWalletsPerPage] = useState(WALLETS_PER_PAGE_OPTIONS[0]);
   const [selectedNetwork, setSelectedNetwork] = useState('');
-  const [createLoading, setCreateLoading] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
     async function fetchWallets() {
       try {
-        const cachedData = localStorage.getItem('walletsData');
-        const cachedTimestamp = localStorage.getItem('walletsTimestamp');
-        
-        if (cachedData && cachedTimestamp) {
-          const parsedData = JSON.parse(cachedData);
-          const timestamp = parseInt(cachedTimestamp, 10);
-          
-          if (Date.now() - timestamp < CACHE_DURATION) {
-            setWallets(parsedData);
-            setLoading(false);
-            return;
-          }
-        }
+        // const cachedData = localStorage.getItem('walletsData');
+        // const cachedTimestamp = localStorage.getItem('walletsTimestamp');
+        //
+        // if (cachedData && cachedTimestamp) {
+        //   const parsedData = JSON.parse(cachedData);
+        //   const timestamp = parseInt(cachedTimestamp, 10);
+        //
+        //   if (Date.now() - timestamp < CACHE_DURATION) {
+        //     setWallets(parsedData);
+        //     setLoading(false);
+        //     return;
+        //   }
+        // }
 
         const response = await fetch('/api/wallets');
         if (!response.ok) {
@@ -47,8 +45,8 @@ export default function Home() {
         setWallets(data);
         setLoading(false);
         
-        localStorage.setItem('walletsData', JSON.stringify(data));
-        localStorage.setItem('walletsTimestamp', Date.now().toString());
+        // localStorage.setItem('walletsData', JSON.stringify(data));
+        // localStorage.setItem('walletsTimestamp', Date.now().toString());
       } catch (err) {
         console.error('Error fetching wallets:', err);
         setError('Failed to load wallets. Please try again later.');
@@ -69,6 +67,7 @@ export default function Home() {
   };
 
   const handleWalletsPerPageChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    console.log("handleWalletsPerPageChange")
     const newWalletsPerPage = parseInt(event.target.value, 10);
     setWalletsPerPage(newWalletsPerPage);
     setCurrentPage(1);
