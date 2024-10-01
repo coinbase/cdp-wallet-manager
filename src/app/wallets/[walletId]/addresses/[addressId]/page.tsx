@@ -13,6 +13,13 @@ export default function AddressPage({ params }: { params: { walletId: string, ad
   const [balancesPerPage, setBalancesPerPage] = useState(BALANCES_PER_PAGE_OPTIONS[0]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState('');
+  const [destinationAddress, setDestinationAddress] = useState('');
+  const [amount, setAmount] = useState('');
+  const [asset, setAsset] = useState('');
+  const [transferLoading, setTransferLoading] = useState(false);
+  const [transferError, setTransferError] = useState('');
+  const [transferSuccess, setTransferSuccess] = useState('');
 
   useEffect(() => {
     const fetchAddress = async () => {
@@ -63,6 +70,75 @@ export default function AddressPage({ params }: { params: { walletId: string, ad
     const newBalancesPerPage = parseInt(event.target.value, 10);
     setBalancesPerPage(newBalancesPerPage);
     setCurrentPage(1);
+  };
+
+  const handleFaucetRequest = async () => {
+    setLoading(true);
+    setError('');
+    setSuccess('');
+
+    try {
+      const response = await fetch(`/api/wallets/${params.walletId}/addresses/${params.addressId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to request faucet');
+      }
+
+      setSuccess('Faucet request successful!');
+    } catch (err) {
+      setError('Failed to request faucet funds');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
+  const handleCreateTransfer = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    console.log('Transfer form submitted');
+    setTransferLoading(true);
+    setTransferError('');
+    setTransferSuccess('');
+
+    try {
+      console.log('Creating transfer:', { destinationAddress, amount, asset });
+      const response = await fetch(`/api/wallets/${params.walletId}/addresses/${params.addressId}/transfers`,{
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          destination_address: destinationAddress,
+          amount,
+          asset: asset,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to create transfer');
+      }
+
+      const data = await response.json();
+      setTransferSuccess('Transfer created successfully: ' + data.transactionLink);
+
+      // Reset form
+      setDestinationAddress('');
+      setAmount('');
+      setAsset('');
+    } catch (err) {
+      console.error('Error creating transfer:', err); // Debugging log
+      setTransferError(err.message);
+    } finally {
+      setTransferLoading(false);
+    }
   };
 
   return (
@@ -155,6 +231,81 @@ export default function AddressPage({ params }: { params: { walletId: string, ad
           >
             <ChevronRight size={20} />
           </button>
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-1 gap-8">
+        {/* Faucet Request Card */}
+        <div className="bg-white shadow-md rounded-lg p-6">
+          <h2 className="text-xl font-semibold mb-4">Request Faucet Funds</h2>
+          <button
+            onClick={handleFaucetRequest}
+            disabled={loading}
+            className="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-md transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 shadow-md disabled:bg-gray-400 disabled:cursor-not-allowed disabled:transform-none"
+            >
+            {loading ? 'Requesting...' : 'Request Faucet'}
+          </button>
+          {error && <p className="text-red-500 mt-2">{error}</p>}
+          {success && <p className="text-green-500 mt-2">{success}</p>}
+        </div>
+
+        {/* Create Transfer Card */}
+        <div className="bg-white shadow-md rounded-lg p-6">
+          <h2 className="text-xl font-semibold mb-4">Create Transfer</h2>
+          <form onSubmit={handleCreateTransfer} className="space-y-4">
+            <div>
+              <label htmlFor="destinationAddress" className="block text-sm font-medium text-gray-700 mb-1">
+                Destination Address
+              </label>
+              <input
+                type="text"
+                id="destinationAddress"
+                value={destinationAddress}
+                onChange={(e) => setDestinationAddress(e.target.value)}
+                required
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                placeholder="0x..."
+              />
+            </div>
+            <div>
+              <label htmlFor="amount" className="block text-sm font-medium text-gray-700 mb-1">
+                Amount
+              </label>
+              <input
+                type="number"
+                id="amount"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                required
+                min="0"
+                step="any"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                placeholder="0.00"
+              />
+            </div>
+            <div>
+              <label htmlFor="asset" className="block text-sm font-medium text-gray-700 mb-1">
+                Asset
+              </label>
+              <input
+                type="text"
+                id="asset"
+                value={asset}
+                onChange={(e) => setAsset(e.target.value)}
+                required
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                placeholder="ETH, USDC, etc."
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={transferLoading}
+              className="w-full bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:bg-gray-400 disabled:cursor-not-allowed"
+            >
+              {transferLoading ? 'Creating Transfer...' : 'Create Transfer'}
+            </button>
+          </form>
+          {transferError && <p className="text-red-500 mt-2">{transferError}</p>}
+          {transferSuccess && <p className="text-green-500 mt-2">{transferSuccess}</p>}
+        </div>
         </div>
       </main>
     </div>

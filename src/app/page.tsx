@@ -5,9 +5,11 @@ import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { WalletListResponse } from "./api/wallets/route";
 import React from 'react';
+import { useRouter } from 'next/navigation';
 
 const WALLETS_PER_PAGE_OPTIONS = [10, 20, 50, 100];
-const CACHE_DURATION = 6 * 60 * 60 * 1000; // 6 hours in milliseconds
+// TODO: Load this from CDP SDK.
+const SUPPORTED_NETWORKS = ['base-sepolia', 'base-mainnet'];
 
 export default function Home() {
   const [wallets, setWallets] = useState<WalletListResponse[]>([]);
@@ -15,23 +17,25 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [walletsPerPage, setWalletsPerPage] = useState(WALLETS_PER_PAGE_OPTIONS[0]);
+  const [selectedNetwork, setSelectedNetwork] = useState('');
+  const router = useRouter();
 
   useEffect(() => {
     async function fetchWallets() {
       try {
-        const cachedData = localStorage.getItem('walletsData');
-        const cachedTimestamp = localStorage.getItem('walletsTimestamp');
-        
-        if (cachedData && cachedTimestamp) {
-          const parsedData = JSON.parse(cachedData);
-          const timestamp = parseInt(cachedTimestamp, 10);
-          
-          if (Date.now() - timestamp < CACHE_DURATION) {
-            setWallets(parsedData);
-            setLoading(false);
-            return;
-          }
-        }
+        // const cachedData = localStorage.getItem('walletsData');
+        // const cachedTimestamp = localStorage.getItem('walletsTimestamp');
+        //
+        // if (cachedData && cachedTimestamp) {
+        //   const parsedData = JSON.parse(cachedData);
+        //   const timestamp = parseInt(cachedTimestamp, 10);
+        //
+        //   if (Date.now() - timestamp < CACHE_DURATION) {
+        //     setWallets(parsedData);
+        //     setLoading(false);
+        //     return;
+        //   }
+        // }
 
         const response = await fetch('/api/wallets');
         if (!response.ok) {
@@ -41,8 +45,8 @@ export default function Home() {
         setWallets(data);
         setLoading(false);
         
-        localStorage.setItem('walletsData', JSON.stringify(data));
-        localStorage.setItem('walletsTimestamp', Date.now().toString());
+        // localStorage.setItem('walletsData', JSON.stringify(data));
+        // localStorage.setItem('walletsTimestamp', Date.now().toString());
       } catch (err) {
         console.error('Error fetching wallets:', err);
         setError('Failed to load wallets. Please try again later.');
@@ -63,9 +67,41 @@ export default function Home() {
   };
 
   const handleWalletsPerPageChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    console.log("handleWalletsPerPageChange")
     const newWalletsPerPage = parseInt(event.target.value, 10);
     setWalletsPerPage(newWalletsPerPage);
     setCurrentPage(1);
+  };
+
+  const handleCreateWallet = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+
+    try {
+      console.log("Creating wallet for network: ", selectedNetwork);
+      const response = await fetch('/api/wallets', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ networkId: selectedNetwork }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create wallet');
+      }
+
+      const data = await response.json();
+      console.log('Wallet created:', data);
+      
+      // Navigate to the new wallet
+      router.push(`/wallets/${data.id}`);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (loading) {
@@ -171,6 +207,38 @@ export default function Home() {
           >
             <ChevronRight size={20} />
           </button>
+        </div>
+        <div className="mt-8">
+          <h2 className="text-2xl font-semibold mb-4">Create New Wallet</h2>
+          <form onSubmit={handleCreateWallet} className="space-y-4">
+            <div>
+              <label htmlFor="network" className="block text-sm font-medium text-gray-700">
+                Select Network
+              </label>
+              <select
+                id="network"
+                value={selectedNetwork}
+                onChange={(e) => setSelectedNetwork(e.target.value)}
+                required
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+              >
+                <option value="">Select a network</option>
+                {SUPPORTED_NETWORKS.map((network) => (
+                  <option key={network} value={network}>
+                    {network}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <button
+              type="submit"
+              disabled={loading || !selectedNetwork}
+              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:bg-gray-400 disabled:cursor-not-allowed"
+            >
+              {loading ? 'Creating...' : 'Create Wallet'}
+            </button>
+          </form>
+          {error && <p className="mt-2 text-red-600">{error}</p>}
         </div>
       </main>
     </div>

@@ -43,3 +43,36 @@ export async function GET(
     return NextResponse.json({ error: 'Failed to fetch address' }, { status: 500 });
   }
 }
+
+export async function POST(
+  request: Request,
+  { params }: { params: { walletId: string; addressId: string } }
+) {
+  try {
+    const { walletId, addressId } = params;
+
+    const wallet = await Wallet.fetch(walletId);
+
+    // Get the address object
+    const addresses = await wallet.listAddresses()
+    
+    const address = addresses.find(addr => addr.getId() === addressId);
+
+    if (!address) {
+      return NextResponse.json({ error: 'Address not found' }, { status: 404 });
+    }
+
+    // Request faucet funds
+    const faucetResult = await address.faucet();
+
+    return NextResponse.json({ 
+      success: true, 
+      message: 'Faucet request successful',
+      result: faucetResult
+    }, { status: 200 });
+
+  } catch (error) {
+    console.error('Error requesting faucet:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}
