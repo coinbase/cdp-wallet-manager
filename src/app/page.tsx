@@ -84,7 +84,7 @@ export default function Home() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-        },
+        },  
         body: JSON.stringify({ networkId: selectedNetwork }),
       });
 
@@ -98,7 +98,11 @@ export default function Home() {
       // Navigate to the new wallet
       router.push(`/wallets/${data.id}`);
     } catch (err) {
-      setError(err.message);
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('An unknown error occurred');
+      }
     } finally {
       setLoading(false);
     }
