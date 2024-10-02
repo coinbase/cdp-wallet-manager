@@ -5,8 +5,5 @@
       "src": "package.json",
       "use": "@vercel/next"
     }
-  ],
-  "env": {
-    "POSTGRES_URL": "@postgres_url"
-  }
+  ]
 }
