@@ -98,7 +98,7 @@ export default function Home() {
       // Navigate to the new wallet
       router.push(`/wallets/${data.id}`);
     } catch (err) {
-      setError(err.message);
+      setError("Failed to create wallet.");
     } finally {
       setLoading(false);
     }
