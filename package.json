@@ -10,7 +10,8 @@
     "db:up": "docker-compose up -d",
     "db:down": "docker-compose down",
     "db:setup": "prisma db push && prisma generate",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "vercel-build": "prisma generate && prisma migrate deploy && next build"
   },
   "dependencies": {
     "@coinbase/coinbase-sdk": "^0.7.0",
