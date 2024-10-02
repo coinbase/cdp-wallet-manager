@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from "next/link";
 import { ArrowLeft, CreditCard, ChevronLeft, ChevronRight } from "lucide-react";
-import { Card, CardBody, CardHeader, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Button, Spinner } from "@nextui-org/react";
+import { Card, CardBody, CardHeader, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Button, Spinner, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@nextui-org/react";
 import { AddressResponse } from '@/app/api/wallets/[walletId]/addresses/[addressId]/route';
 import CustomInput from '@/app/components/CustomInput';
 
@@ -17,14 +17,14 @@ export default function AddressPage({ params }: { params: { walletId: string, ad
   const [faucetError, setFaucetError] = useState<string | null>(null);
   const [faucetSuccess, setFaucetSuccess] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [balancesPerPage, setBalancesPerPage] = useState(BALANCES_PER_PAGE_OPTIONS[0]);
-  const [success, setSuccess] = useState('');
   const [destinationAddress, setDestinationAddress] = useState('');
   const [amount, setAmount] = useState('');
   const [asset, setAsset] = useState('');
   const [transferLoading, setTransferLoading] = useState(false);
   const [transferError, setTransferError] = useState('');
   const [transferSuccess, setTransferSuccess] = useState('');
+  const [balancesPerPage, setBalancesPerPage] = useState(BALANCES_PER_PAGE_OPTIONS[0]);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const fetchAddress = async () => {
     try {
@@ -124,6 +124,11 @@ export default function AddressPage({ params }: { params: { walletId: string, ad
     setCurrentPage(newPage);
   };
 
+  const handleBalancesPerPageChange = (key: string) => {
+    setBalancesPerPage(Number(key));
+    setCurrentPage(1); // Reset to first page when changing items per page
+  };
+
   if (addressLoading) {
     return (
       <div className="fixed inset-0 bg-background/50 backdrop-blur-md flex justify-center items-center z-50">
@@ -175,6 +180,31 @@ export default function AddressPage({ params }: { params: { walletId: string, ad
       <Card className="border border-gray-200 shadow-sm">
         <CardHeader className="flex justify-between items-center px-6 py-4 bg-gray-50">
           <h2 className="text-lg font-semibold">Balances</h2>
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-gray-600">Items per page:</span>
+            <Dropdown onOpenChange={setIsDropdownOpen}>
+              <DropdownTrigger>
+                <Button 
+                  variant="light" 
+                  className={`min-w-[70px] border transition-colors ${
+                    isDropdownOpen
+                      ? 'bg-blue-100 border-blue-600 text-blue-600'
+                      : 'bg-transparent border-gray-300 hover:border-blue-600 text-gray-700 hover:text-blue-600'
+                  }`}
+                >
+                  {balancesPerPage}
+                </Button>
+              </DropdownTrigger>
+              <DropdownMenu 
+                aria-label="Balances per page"
+                onAction={(key) => handleBalancesPerPageChange(key.toString())}
+              >
+                {BALANCES_PER_PAGE_OPTIONS.map((option) => (
+                  <DropdownItem key={option}>{option}</DropdownItem>
+                ))}
+              </DropdownMenu>
+            </Dropdown>
+          </div>
         </CardHeader>
         <CardBody className="px-6 py-4">
           <Table aria-label="Balances table" className="min-w-full">

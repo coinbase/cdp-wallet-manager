@@ -22,6 +22,7 @@ export default function WalletPage({ params }: { params: { walletId: string } })
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [balancesPerPage, setBalancesPerPage] = useState(BALANCES_PER_PAGE_OPTIONS[0]);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   useEffect(() => {
     async function fetchWallet() {
@@ -67,6 +68,11 @@ export default function WalletPage({ params }: { params: { walletId: string } })
     setCurrentPage(page);
   };
 
+  const handleBalancesPerPageChange = (key: string) => {
+    setBalancesPerPage(Number(key));
+    setCurrentPage(1); // Reset to first page when changing items per page
+  };
+
   return (
     <div className="container max-w-4xl mx-auto p-4 space-y-6">
       <Link href="/" className="inline-flex items-center text-blue-600 hover:text-blue-800 mb-4">
@@ -102,16 +108,23 @@ export default function WalletPage({ params }: { params: { walletId: string } })
         <CardHeader className="flex justify-between items-center px-6 py-4">
           <h2 className="text-lg font-semibold">Balances</h2>
           <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-500">Show:</span>
-            <Dropdown>
+            <span className="text-sm text-gray-500">Items per page:</span>
+            <Dropdown onOpenChange={setIsDropdownOpen}>
               <DropdownTrigger>
-                <Button variant="bordered" size="sm">
+                <Button 
+                  variant="light" 
+                  className={`min-w-[70px] border transition-colors ${
+                    isDropdownOpen
+                      ? 'bg-blue-100 border-blue-600 text-blue-600'
+                      : 'bg-transparent border-gray-300 hover:border-blue-600 text-gray-700 hover:text-blue-600'
+                  }`}
+                >
                   {balancesPerPage}
                 </Button>
               </DropdownTrigger>
               <DropdownMenu 
                 aria-label="Balances per page"
-                onAction={(key) => setBalancesPerPage(Number(key))}
+                onAction={(key) => handleBalancesPerPageChange(key.toString())}
               >
                 {BALANCES_PER_PAGE_OPTIONS.map((option) => (
                   <DropdownItem key={option}>{option}</DropdownItem>

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from 'next/navigation';
-import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Button, Card, CardBody, CardHeader, Spinner, Pagination } from "@nextui-org/react";
+import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Button, Card, CardBody, CardHeader, Spinner } from "@nextui-org/react";
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@nextui-org/react";
 import { Selection } from "@nextui-org/react";
 import { ChevronDownIcon } from '@heroicons/react/20/solid';
@@ -18,6 +18,7 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [selectedNetwork, setSelectedNetwork] = useState<Selection>(new Set([]));
   const [walletsPerPage, setWalletsPerPage] = useState(WALLETS_PER_PAGE_OPTIONS[0]);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const router = useRouter();
 
@@ -114,12 +115,15 @@ export default function Home() {
           <h2 className="text-2xl font-semibold">Wallets</h2>
           <div className="flex items-center space-x-2">
             <span className="text-sm text-gray-600">Wallets per page:</span>
-            <Dropdown>
+            <Dropdown onOpenChange={setIsDropdownOpen}>
               <DropdownTrigger>
                 <Button 
-                  variant="bordered" 
-                  className="text-sm min-w-[70px]"
-                  endContent={<ChevronDownIcon className="h-4 w-4" />}
+                  variant="light" 
+                  className={`min-w-[70px] border transition-colors ${
+                    isDropdownOpen
+                      ? 'bg-blue-100 border-blue-600 text-blue-600'
+                      : 'bg-transparent border-gray-300 hover:border-blue-600 text-gray-700 hover:text-blue-600'
+                  }`}
                 >
                   {walletsPerPage}
                 </Button>
