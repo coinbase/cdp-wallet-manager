@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { Wallet } from '@coinbase/coinbase-sdk';
 import { formatNetworkId } from '@/utils/stringUtils';
 import  '@/lib/server/coinbase';
-import {addSeedRecord} from "@/app/db/db";
+import {createWallet} from "@/app/db/db";
 import {WalletResponse} from "@/app/api/wallets/[walletId]/route";
 
 export interface WalletListResponse {
@@ -63,7 +63,7 @@ export async function POST(request: Request) {
     const walletData = await wallet.export();
 
     // Insert the wallet data into the database.
-    await addSeedRecord(walletId as string, walletData.seed, process.env.ENCRYPTION_KEY as string);
+    await createWallet(walletId as string, walletData.seed);
 
     // Fetch balances
     const balances = await wallet.listBalances();

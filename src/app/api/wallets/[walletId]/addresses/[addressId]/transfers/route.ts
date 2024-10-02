@@ -1,4 +1,4 @@
-import { getSeed } from '@/app/db/db';
+import { getWallet } from '@/app/db/db';
 import { Wallet } from '@coinbase/coinbase-sdk';
 import { NextResponse } from 'next/server';
 import  '@/lib/server/coinbase';
@@ -36,7 +36,7 @@ export async function POST(request: Request, { params }: { params: { walletId: s
 
       const walletId = wallet.getId() as string;
   
-      const seed = await getSeed(walletId, process.env.ENCRYPTION_KEY as string);
+      const seed = await getWallet(walletId);
   
       wallet.setSeed(seed as string);
 
