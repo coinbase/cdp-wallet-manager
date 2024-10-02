@@ -3,7 +3,7 @@ services:
     image: postgres:14
     restart: always
     environment:
-      POSTGRES_DB: cdp-wallet-manager
+      POSTGRES_DB: seeds
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: password
     ports:
