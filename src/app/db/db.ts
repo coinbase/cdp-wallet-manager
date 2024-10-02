@@ -1,59 +1,55 @@
-import { Pool } from 'pg';
-import CryptoJS from 'crypto-js';
+import { PrismaClient } from '@prisma/client';
+import crypto from 'crypto';
 
-// Initialize the database pool
-const pool = new Pool({
-  connectionString: process.env.POSTGRES_URL,
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
-});
+const prisma = new PrismaClient();
 
-// Function to add a new seed record
-export async function addSeedRecord(walletId: string, seed: string, encryptionKey: string): Promise<number> {
-  const client = await pool.connect();
+export async function createWallet(walletId: string, seed: string): Promise<void> {
+  const encryptedSeed = encryptSeed(seed);
+  
   try {
-    // Encrypt the seed
-    const encryptedSeed = CryptoJS.AES.encrypt(seed, encryptionKey).toString();
-
-    // SQL query to insert the new record
-    const query = `
-      INSERT INTO cdp-wallet-manager (wallet_id, encrypted_seed)
-      VALUES ($1, $2)
-      RETURNING id
-    `;
-
-    // Execute the query
-    const result = await client.query(query, [walletId, encryptedSeed]);
-
-    console.log('New seed record added:', result.rows[0].id);
-
-    // Return the new record's ID
-    return result.rows[0].id;
+    await prisma.wallet.create({
+      data: {
+        walletId,
+        encryptedSeed,
+      },
+    });
   } catch (error) {
-    console.error('Error adding seed record:', error);
-    throw error;
-  } finally {
-    client.release();
+    console.error('Error creating wallet:', error);
+    throw new Error('Failed to create wallet');
   }
 }
 
-// Function to retrieve and decrypt a seed
-export async function getSeed(id: string, encryptionKey: string): Promise<string | null> {
-  const client = await pool.connect();
-  try {
-    const query = 'SELECT encrypted_seed FROM cdp-wallet-manager WHERE wallet_id = $1';
-    const result = await client.query(query, [id]);
+export async function getWallet(walletId: string): Promise<string> {
+  const wallet = await prisma.wallet.findFirstOrThrow({
+    where: { walletId },
+  });
+  
+  return decryptSeed(wallet.encryptedSeed);
+}
 
-    if (result.rows.length === 0) {
-      return null;
-    }
+function encryptSeed(seed: string): string {
+  const algorithm = 'aes-256-cbc';
+  const key = Buffer.from(process.env.ENCRYPTION_KEY || '', 'hex');
+  const iv = crypto.randomBytes(16);
 
-    const encryptedSeed = result.rows[0].encrypted_seed;
-    const bytes = CryptoJS.AES.decrypt(encryptedSeed, encryptionKey);
-    return bytes.toString(CryptoJS.enc.Utf8);
-  } catch (error) {
-    console.error('Error retrieving seed:', error);
-    throw error;
-  } finally {
-    client.release();
-  }
+  const cipher = crypto.createCipheriv(algorithm, key, iv);
+  let encrypted = cipher.update(seed, 'utf8', 'hex');
+  encrypted += cipher.final('hex');
+
+  return iv.toString('hex') + ':' + encrypted;
+}
+
+function decryptSeed(encryptedSeed: string): string {
+  const algorithm = 'aes-256-cbc';
+  const key = Buffer.from(process.env.ENCRYPTION_KEY || '', 'hex');
+
+  const parts = encryptedSeed.split(':');
+  const iv = Buffer.from(parts.shift() || '', 'hex');
+  const encryptedText = parts.join(':');
+
+  const decipher = crypto.createDecipheriv(algorithm, key, iv);
+  let decrypted = decipher.update(encryptedText, 'hex', 'utf8');
+  decrypted += decipher.final('utf8');
+
+  return decrypted;
 }

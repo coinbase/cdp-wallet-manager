@@ -1,8 +1,45 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
+### Get your API keys
+Go to https://portal.cdp.coinbase.com/ and create an API key if you don't already have one.
 
-First, run the development server:
+### Create an encryption key
+
+```bash
+openssl rand -hex 32
+```
+
+### Setup your environment variables
+
+Create a `.env` file in the root of the project with the following:
+
+```bash
+CDP_API_KEY_NAME="your-api-key-name"
+CDP_API_KEY_SECRET="your-api-key-secret"
+ENCRYPTION_KEY="your-encryption-key"
+POSTGRES_URL="postgresql://admin:password@localhost:5432/seeds"
+```
+
+### Run the Postgres DB
+
+```bash
+npm run db:up
+```
+
+If you don't see database logs, double check Postgres is installed:
+
+```bash
+docker run --name test-postgres -e POSTGRES_PASSWORD=password -e POSTGRES_DB=seeds -e POSTGRES_USER=admin -p 5432:5432 postgres:14
+```
+
+Set up the Prisma schema in the DB
+
+```bash
+npm run db:push
+```
+
+### Run the app
 
 ```bash
 npm run dev

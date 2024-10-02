@@ -135,7 +135,11 @@ export default function AddressPage({ params }: { params: { walletId: string, ad
       setAsset('');
     } catch (err) {
       console.error('Error creating transfer:', err); // Debugging log
-      setTransferError('Failed to create transfer');
+      if (err instanceof Error) {
+        setTransferError(err.message);
+      } else {
+        setTransferError('An unknown error occurred');
+      }
     } finally {
       setTransferLoading(false);
     }
