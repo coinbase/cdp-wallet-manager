@@ -16,7 +16,7 @@ export async function addSeedRecord(walletId: string, seed: string, encryptionKe
 
     // SQL query to insert the new record
     const query = `
-      INSERT INTO wallets (wallet_id, encrypted_seed)
+      INSERT INTO cdp-wallet-manager (wallet_id, encrypted_seed)
       VALUES ($1, $2)
       RETURNING id
     `;
@@ -40,7 +40,7 @@ export async function addSeedRecord(walletId: string, seed: string, encryptionKe
 export async function getSeed(id: string, encryptionKey: string): Promise<string | null> {
   const client = await pool.connect();
   try {
-    const query = 'SELECT encrypted_seed FROM wallets WHERE wallet_id = $1';
+    const query = 'SELECT encrypted_seed FROM cdp-wallet-manager WHERE wallet_id = $1';
     const result = await client.query(query, [id]);
 
     if (result.rows.length === 0) {

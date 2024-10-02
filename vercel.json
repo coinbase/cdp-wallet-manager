@@ -7,6 +7,6 @@
     }
   ],
   "env": {
-    "POSTGRES_URL": "@postgres_url"
+    "POSTGRES_URL": "@POSTGRES_URL"
   }
 }
