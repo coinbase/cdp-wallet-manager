@@ -85,7 +85,7 @@ export default function WalletPage({ params }: { params: { walletId: string } })
           <div className="flex items-center gap-3">
             <Wallet size={24} className="text-blue-600" />
             <div>
-              <h1 className="text-lg text-gray-800 dark:text-gray-200 font-semibold">Wallet Details</h1>
+              <h1 className="text-lg text-gray-800 dark:text-gray-800 font-semibold">Wallet Details</h1>
               <p className="text-sm text-gray-500">ID: {params.walletId}</p>
             </div>
           </div>
@@ -93,12 +93,12 @@ export default function WalletPage({ params }: { params: { walletId: string } })
         <CardBody className="px-6 py-4">
           <div className="grid grid-cols-2 gap-6">
             <div>
-              <p className="text-sm font-medium text-gray-500 mb-1">Network</p>
-              <p className="text-base">{wallet.network}</p>
+              <p className="text-sm font-medium text-gray-500 dark:text-gray-800 mb-1">Network</p>
+              <p className="text-base text-gray-500 dark:text-gray-800 ">{wallet.network}</p>
             </div>
             <div>
               <p className="text-sm font-medium text-gray-500 mb-1">Default Address</p>
-              <p className="text-base break-all font-mono">{wallet.defaultAddress || 'N/A'}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-800 ">{wallet.defaultAddress || 'N/A'}</p>
             </div>
           </div>
         </CardBody>
@@ -106,9 +106,9 @@ export default function WalletPage({ params }: { params: { walletId: string } })
 
       <Card className="shadow-sm">
         <CardHeader className="flex justify-between items-center px-6 py-4">
-          <h2 className="text-lg font-semibold">Balances</h2>
+          <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-800">Balances</h2>
           <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-500">Items per page:</span>
+            <span className="text-sm text-gray-500 dark:text-gray-800">Items per page:</span>
             <Dropdown onOpenChange={setIsDropdownOpen}>
               <DropdownTrigger>
                 <Button 
@@ -116,7 +116,7 @@ export default function WalletPage({ params }: { params: { walletId: string } })
                   className={`min-w-[70px] border transition-colors ${
                     isDropdownOpen
                       ? 'bg-blue-100 border-blue-600 text-blue-600'
-                      : 'bg-transparent border-gray-300 hover:border-blue-600 text-gray-700 hover:text-blue-600'
+                      : 'bg-transparent border-gray-300 hover:border-blue-600 text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-gray-200'
                   }`}
                 >
                   {balancesPerPage}
@@ -134,7 +134,7 @@ export default function WalletPage({ params }: { params: { walletId: string } })
           </div>
         </CardHeader>
         <CardBody className="px-6 py-4">
-          <Table aria-label="Balances table" className="min-w-full">
+          <Table aria-label="Balances table" className="min-w-full text-gray-800 dark:text-gray-800">
             <TableHeader>
               <TableColumn className="text-left">CURRENCY</TableColumn>
               <TableColumn className="text-right">AMOUNT</TableColumn>
@@ -186,27 +186,27 @@ export default function WalletPage({ params }: { params: { walletId: string } })
 
       <Card className="shadow-sm">
         <CardHeader className="px-6 py-4">
-          <h2 className="text-lg font-semibold">Addresses</h2>
+          <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-800">Addresses</h2>
         </CardHeader>
         <CardBody className="px-6 py-4">
           <Table aria-label="Addresses table" className="min-w-full">
             <TableHeader>
-              <TableColumn className="w-1/6">INDEX</TableColumn>
-              <TableColumn>ADDRESS</TableColumn>
+              <TableColumn className="w-1/6 text-gray-800 dark:text-gray-800">INDEX</TableColumn>
+              <TableColumn className="text-gray-800 dark:text-gray-800">ADDRESS</TableColumn>
             </TableHeader>
             <TableBody>
               {wallet.addresses.map((address, index) => (
                 <TableRow key={index}>
-                  <TableCell>{index}</TableCell>
+                  <TableCell className="text-gray-800 dark:text-gray-800">{index}</TableCell>
                   <TableCell>
                     <Link 
                       href={`/wallets/${wallet.id}/addresses/${address}`}
-                      className="text-blue-600 hover:text-blue-800 hover:underline"
+                      className="text-blue-600 hover:text-blue-800 hover:underline text-gray-800 dark:text-gray-800"
                     >
                       {address}
                     </Link>
                     {address === wallet.defaultAddress && (
-                      <span className="ml-2 text-xs bg-blue-100 text-blue-800 py-1 px-2 rounded-full">
+                      <span className="ml-2 text-xs bg-blue-100 text-blue-800 py-1 px-2 rounded-full dark:bg-blue-900 dark:text-blue-400">
                         Default
                       </span>
                     )}

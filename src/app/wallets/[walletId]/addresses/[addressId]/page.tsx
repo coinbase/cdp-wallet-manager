@@ -148,48 +148,48 @@ export default function AddressPage({ params }: { params: { walletId: string, ad
 
   return (
     <div className="container max-w-4xl mx-auto p-4 space-y-6">
-      <Link href={`/wallets/${address.walletId}`} className="inline-flex items-center text-blue-600 hover:text-blue-800 mb-4">
+      <Link href={`/wallets/${address.walletId}`} className="inline-flex items-center text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 mb-4">
         <ArrowLeft className="mr-2" size={20} />
         <span>Back to Wallet</span>
       </Link>
 
-      <Card className="border border-gray-200 shadow-sm">
-        <CardHeader className="flex justify-between items-center px-6 py-4 bg-gray-50">
+      <Card className="border border-gray-200 dark:border-gray-700 shadow-sm">
+        <CardHeader className="flex justify-between items-center px-6 py-4 bg-gray-50 dark:bg-gray-800">
           <div className="flex items-center gap-3">
-            <CreditCard size={24} className="text-blue-600" />
+            <CreditCard size={24} className="text-blue-600 dark:text-blue-400" />
             <div>
               <h1 className="text-lg text-gray-800 dark:text-gray-200 font-semibold">Address Details</h1>
-              <p className="text-sm text-gray-500">ID: {address.id}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-800">ID: {address.id}</p>
             </div>
           </div>
         </CardHeader>
         <CardBody className="px-6 py-4">
           <div className="grid grid-cols-2 gap-6">
             <div>
-              <p className="text-sm font-medium text-gray-500 mb-1">Network</p>
-              <p className="text-base">{address.network}</p>
+              <p className="text-sm font-medium text-gray-500 dark:text-gray-800 mb-1">Network</p>
+              <p className="text-base text-gray-800 dark:text-gray-800">{address.network}</p>
             </div>
             <div>
-              <p className="text-sm font-medium text-gray-500 mb-1">Wallet ID</p>
-              <p className="text-base">{address.walletId}</p>
+              <p className="text-sm font-medium text-gray-500 dark:text-gray-800 mb-1">Wallet ID</p>
+              <p className="text-base text-gray-800 dark:text-gray-800">{address.walletId}</p>
             </div>
           </div>
         </CardBody>
       </Card>
 
-      <Card className="border border-gray-200 shadow-sm">
-        <CardHeader className="flex justify-between items-center px-6 py-4 bg-gray-50">
-          <h2 className="text-lg font-semibold">Balances</h2>
+      <Card className="border border-gray-200 dark:border-gray-700 shadow-sm">
+        <CardHeader className="flex justify-between items-center px-6 py-4 bg-gray-50 dark:bg-gray-800">
+          <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200">Balances</h2>
           <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-600">Items per page:</span>
+            <span className="text-sm text-gray-600 dark:text-gray-200">Items per page:</span>
             <Dropdown onOpenChange={setIsDropdownOpen}>
               <DropdownTrigger>
                 <Button 
                   variant="light" 
                   className={`min-w-[70px] border transition-colors ${
                     isDropdownOpen
-                      ? 'bg-blue-100 border-blue-600 text-blue-600'
-                      : 'bg-transparent border-gray-300 hover:border-blue-600 text-gray-700 hover:text-blue-600'
+                      ? 'bg-blue-100 border-blue-600 text-blue-600 dark:bg-blue-900 dark:border-blue-400 dark:text-grey-200'
+                      : 'bg-transparent border-gray-300 hover:border-blue-600 text-gray-700 hover:text-blue-600 dark:text-gray-800 dark:hover:text-grey-200'
                   }`}
                 >
                   {balancesPerPage}
@@ -200,7 +200,7 @@ export default function AddressPage({ params }: { params: { walletId: string, ad
                 onAction={(key) => handleBalancesPerPageChange(key.toString())}
               >
                 {BALANCES_PER_PAGE_OPTIONS.map((option) => (
-                  <DropdownItem key={option}>{option}</DropdownItem>
+                  <DropdownItem key={option} className="text-gray-700 dark:text-gray-800">{option}</DropdownItem>
                 ))}
               </DropdownMenu>
             </Dropdown>
@@ -209,14 +209,14 @@ export default function AddressPage({ params }: { params: { walletId: string, ad
         <CardBody className="px-6 py-4">
           <Table aria-label="Balances table" className="min-w-full">
             <TableHeader>
-              <TableColumn className="text-left">CURRENCY</TableColumn>
-              <TableColumn className="text-right">AMOUNT</TableColumn>
+              <TableColumn className="text-left text-gray-700 dark:text-gray-800">CURRENCY</TableColumn>
+              <TableColumn className="text-right text-gray-700 dark:text-gray-800">AMOUNT</TableColumn>
             </TableHeader>
             <TableBody>
               {currentBalances.map(([currency, amount]) => (
                 <TableRow key={currency}>
-                  <TableCell className="text-left text-base">{currency}</TableCell>
-                  <TableCell className="text-right text-base">{amount}</TableCell>
+                  <TableCell className="text-left text-base text-gray-800 dark:text-gray-800">{currency}</TableCell>
+                  <TableCell className="text-right text-base text-gray-800 dark:text-gray-800">{amount}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -260,7 +260,7 @@ export default function AddressPage({ params }: { params: { walletId: string, ad
       <div className="grid grid-cols-1 gap-6">
         <Card className="border border-gray-200 shadow-sm">
           <CardHeader className="px-6 py-4 bg-gray-50">
-            <h2 className="text-lg font-semibold">Request Faucet Funds</h2>
+            <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-800">Request Faucet Funds</h2>
           </CardHeader>
           <CardBody className="px-6 py-4">
             <Button
@@ -279,7 +279,7 @@ export default function AddressPage({ params }: { params: { walletId: string, ad
 
         <Card className="border border-gray-200 shadow-sm">
           <CardHeader className="px-6 py-4 bg-gray-50">
-            <h2 className="text-lg font-semibold">Create Transfer</h2>
+            <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-800">Create Transfer</h2>
           </CardHeader>
           <CardBody className="px-6 py-4">
             <form onSubmit={handleCreateTransfer} className="space-y-4">

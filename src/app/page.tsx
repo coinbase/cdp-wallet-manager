@@ -96,21 +96,21 @@ export default function Home() {
   return (
     <div className="container max-w-4xl mx-auto p-4 space-y-6">
       <h1 className="text-4xl font-bold mb-8 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-pink-600">CDP Wallet Manager</h1>
-      <Card>
+      <Card className="bg-white dark:bg-gray-800">
         <CardHeader className="flex justify-between items-center">
           <h2 className="text-2xl font-semibold flex items-center text-gray-800 dark:text-gray-200">
             <Wallet className="mr-2 h-6 w-6" /> Wallets
           </h2>
           <div className="flex items-center space-x-2">
-            <span className="text-sm text-gray-600">Wallets per page:</span>
+            <span className="text-sm text-gray-600 dark:text-gray-200">Wallets per page:</span>
             <Dropdown onOpenChange={setIsDropdownOpen}>
               <DropdownTrigger>
                 <Button 
                   variant="light" 
                   className={`min-w-[70px] border transition-colors ${
                     isDropdownOpen
-                      ? 'bg-blue-100 border-blue-600 text-blue-600'
-                      : 'bg-transparent border-gray-300 hover:border-blue-600 text-gray-700 hover:text-blue-600'
+                      ? 'bg-blue-100 border-blue-600 text-blue-600 dark:text-gray-800'
+                      : 'bg-transparent border-gray-300 hover:border-blue-600 text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-gray-200'
                   }`}
                 >
                   {walletsPerPage}
@@ -128,10 +128,21 @@ export default function Home() {
           </div>
         </CardHeader>
         <CardBody>
-          <Table aria-label="Wallets table">
+          <Table 
+            aria-label="Wallets table"
+            classNames={{
+              base: "max-w-full",
+              table: "min-w-full border-collapse border border-gray-200 dark:border-gray-700",
+              thead: "bg-gray-100 dark:bg-gray-700",
+              tbody: "bg-white dark:bg-gray-900",
+              tr: "border-b border-gray-200 dark:border-gray-700",
+              th: "text-left p-3 text-gray-800 dark:text-gray-200 font-semibold",
+              td: "p-3 text-gray-800 dark:text-gray-200",
+            }}
+          >
             <TableHeader>
               {columns.map((column) => (
-                <TableColumn key={column.uid} className="text-gray-800 dark:text-gray-200 font-semibold">
+                <TableColumn key={column.uid} className="text-gray-800 dark:text-gray-800 font-semibold">
                   {column.name}
                 </TableColumn>
               ))}
@@ -141,7 +152,7 @@ export default function Home() {
                 <TableRow key={wallet.id}>
                   <TableCell>
                     <span 
-                      className="text-blue-600 cursor-pointer" 
+                      className="text-blue-600 cursor-pointer text-gray-800 dark:text-gray-200" 
                       onClick={() => router.push(`/wallets/${wallet.id}`)}
                     >
                       {wallet.id}
@@ -195,7 +206,7 @@ export default function Home() {
                     className={`min-w-[70px] border transition-colors ${
                       isNetworkDropdownOpen
                       ? 'bg-blue-100 border-blue-600 text-blue-600'
-                      : 'bg-transparent border-gray-300 hover:border-blue-600 text-gray-700 hover:text-blue-600'
+                      : 'bg-transparent border-gray-300 hover:border-blue-600 text-gray-700 hover:text-blue-600 dark:text-gray-200'
                     }`}
                     endContent={<ChevronDownIcon className="h-4 w-4" />}
                   >
@@ -232,7 +243,7 @@ export default function Home() {
         </CardBody>
       </Card>
       
-      {error && <p className="text-red-500 mt-4 text-sm">{error}</p>}
+      {error && <p className="text-red-500 dark:text-red-400 mt-4 text-sm">{error}</p>}
     </div>
   );
 }

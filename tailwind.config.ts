@@ -8,6 +8,7 @@ const config: Config = {
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
     "./node_modules/@nextui-org/theme/dist/**/*.{js,ts,jsx,tsx}",
     "./src/app/components/**/*.{js,ts,jsx,tsx}",
+    "./node_modules/@nextui-org/theme/dist/**/*.{js,ts,jsx,tsx}"
   ],
   theme: {
     extend: {
@@ -74,6 +75,7 @@ const config: Config = {
           800: '#610726',
           900: '#310413',
         },
+        black: '#000000',
       },
       fontFamily: {
         sans: ['var(--font-geist-sans)'],
@@ -87,7 +89,7 @@ const config: Config = {
       },
     },
   },
-  darkMode: "class",
+  darkMode: "media", // This tells Tailwind to use the browser's preference
   plugins: [
     require('@tailwindcss/forms'),
     nextui({
