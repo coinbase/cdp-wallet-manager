@@ -152,7 +152,7 @@ export default function Home() {
                 <TableRow key={wallet.id}>
                   <TableCell>
                     <span 
-                      className="text-blue-600 cursor-pointer text-gray-800 dark:text-gray-200" 
+                      className="text-blue-600 cursor-pointer dark:text-gray-200" 
                       onClick={() => router.push(`/wallets/${wallet.id}`)}
                     >
                       {wallet.id}

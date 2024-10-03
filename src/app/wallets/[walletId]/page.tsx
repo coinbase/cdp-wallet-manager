@@ -201,7 +201,7 @@ export default function WalletPage({ params }: { params: { walletId: string } })
                   <TableCell>
                     <Link 
                       href={`/wallets/${wallet.id}/addresses/${address}`}
-                      className="text-blue-600 hover:text-blue-800 hover:underline text-gray-800 dark:text-gray-800"
+                      className="text-blue-600 hover:text-blue-800 hover:underline text-blue-600 cursor-pointer dark:text-blue-800"
                     >
                       {address}
                     </Link>
