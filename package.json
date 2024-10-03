@@ -9,7 +9,7 @@
     "lint": "next lint",
     "db:up": "docker-compose up -d",
     "db:down": "docker-compose down",
-    "db:setup": "prisma db push && prisma generate",
+    "db:setup": "prisma migrate dev && prisma generate",
     "postinstall": "prisma generate",
     "vercel-build": "prisma generate && prisma migrate deploy && next build"
   },
