@@ -10,7 +10,7 @@ import { WalletListResponse } from "./api/wallets/route";
 import { ChevronLeft, ChevronRight, Wallet } from "lucide-react";
 
 const WALLETS_PER_PAGE_OPTIONS = [10, 20, 50, 100];
-const SUPPORTED_NETWORKS = ['base-sepolia'];
+const SUPPORTED_NETWORKS = ['base-sepolia', 'base-mainnet'];
 
 export default function Home() {
   const [wallets, setWallets] = useState<WalletListResponse[]>([]);
@@ -22,10 +22,12 @@ export default function Home() {
   const [currentPage, setCurrentPage] = useState(1);
   const [createWalletLoading, setCreateWalletLoading] = useState(false);
   const [createWalletError, setCreateWalletError] = useState<string | null>(null);
+  const [mainnetDisabled, setMainnetDisabled] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
     fetchWallets();
+    checkMainnetStatus();
   }, []);
 
   async function fetchWallets() {
@@ -39,6 +41,17 @@ export default function Home() {
       setError('Failed to load wallets. Please try again later.');
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function checkMainnetStatus() {
+    try {
+      const response = await fetch('/api/mainnet-status');
+      if (!response.ok) throw new Error('Failed to fetch mainnet status');
+      const { disabled } = await response.json();
+      setMainnetDisabled(disabled);
+    } catch (err) {
+      console.error('Error fetching mainnet status:', err);
     }
   }
 
@@ -227,7 +240,7 @@ export default function Home() {
                 onSelectionChange={setSelectedNetwork}
                 className="bg-white dark:bg-gray-800"
               >
-                {SUPPORTED_NETWORKS.map((network) => (
+                {SUPPORTED_NETWORKS.filter(network => !mainnetDisabled || !network.includes('mainnet')).map((network) => (
                   <DropdownItem key={network}>{network}</DropdownItem>
                 ))}
               </DropdownMenu>
