@@ -7,7 +7,7 @@ import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@nextui-o
 import { Selection } from "@nextui-org/react";
 import { ChevronDownIcon } from '@heroicons/react/20/solid';
 import { WalletListResponse } from "./api/wallets/route";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Wallet } from "lucide-react";
 
 const WALLETS_PER_PAGE_OPTIONS = [10, 20, 50, 100];
 const SUPPORTED_NETWORKS = ['base-sepolia', 'base-mainnet'];
@@ -69,20 +69,6 @@ export default function Home() {
     { name: "NETWORK", uid: "network" },
   ];
 
-  const renderCell = (wallet, columnKey) => {
-    const cellValue = wallet[columnKey];
-    switch (columnKey) {
-      case "id":
-        return (
-          <span className="text-blue-600 cursor-pointer" onClick={() => router.push(`/wallets/${wallet.id}`)}>
-            {cellValue}
-          </span>
-        );
-      default:
-        return cellValue;
-    }
-  };
-
   const paginatedWallets = wallets.slice(
     (currentPage - 1) * walletsPerPage,
     currentPage * walletsPerPage
@@ -107,12 +93,13 @@ export default function Home() {
   }
 
   return (
-    <div className="container mx-auto p-6">
+    <div className="container max-w-4xl mx-auto p-4 space-y-6">
       <h1 className="text-4xl font-bold mb-8 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-pink-600">CDP Wallet Manager</h1>
-      
       <Card>
-        <CardHeader className="flex justify-between items-center">
-          <h2 className="text-2xl font-semibold">Wallets</h2>
+      <CardHeader className="flex justify-between items-center">
+          <h2 className="text-2xl font-semibold flex items-center">
+            <Wallet className="mr-2 h-6 w-6" /> Wallets
+          </h2>
           <div className="flex items-center space-x-2">
             <span className="text-sm text-gray-600">Wallets per page:</span>
             <Dropdown onOpenChange={setIsDropdownOpen}>
@@ -149,11 +136,15 @@ export default function Home() {
             <TableBody>
               {paginatedWallets.map((wallet) => (
                 <TableRow key={wallet.id}>
-                  {columns.map((column) => (
-                    <TableCell key={`${wallet.id}-${column.uid}`}>
-                      {renderCell(wallet, column.uid)}
-                    </TableCell>
-                  ))}
+                  <TableCell>
+                    <span 
+                      className="text-blue-600 cursor-pointer" 
+                      onClick={() => router.push(`/wallets/${wallet.id}`)}
+                    >
+                      {wallet.id}
+                    </span>
+                  </TableCell>
+                  <TableCell>{wallet.network}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -201,7 +192,7 @@ export default function Home() {
                     className="text-sm"
                     endContent={<ChevronDownIcon className="h-4 w-4" />}
                   >
-                    {selectedNetwork.size > 0 ? Array.from(selectedNetwork)[0] as string : "Select Network"}
+                    {selectedNetwork !== "all" ? selectedNetwork : "Select Network"}
                   </Button>
                 </DropdownTrigger>
                 <DropdownMenu
@@ -222,7 +213,7 @@ export default function Home() {
               <Button
                 color="primary"
                 className="text-sm text-white bg-blue-600 hover:bg-blue-700"
-                disabled={loading || selectedNetwork.size === 0}
+                disabled={loading || (selectedNetwork !== "all" && selectedNetwork.size === 0)}
                 onClick={handleCreateWallet}
               >
                 {loading ? <Spinner size="sm" /> : 'Create Wallet'}
