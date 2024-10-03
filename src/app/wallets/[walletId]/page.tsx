@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from "next/link";
 import { ArrowLeft, Wallet, ChevronLeft, ChevronRight } from "lucide-react";
+import { Card, CardBody, CardHeader, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Button, Spinner, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@nextui-org/react";
 
 export type Wallet = {
   id: string;
@@ -21,179 +22,201 @@ export default function WalletPage({ params }: { params: { walletId: string } })
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [balancesPerPage, setBalancesPerPage] = useState(BALANCES_PER_PAGE_OPTIONS[0]);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   useEffect(() => {
     async function fetchWallet() {
       try {
         const response = await fetch(`/api/wallets/${params.walletId}`);
-        if (!response.ok) {
-          throw new Error('Failed to fetch wallet');
-        }
+        if (!response.ok) throw new Error('Failed to fetch wallet');
         const data = await response.json();
         setWallet(data);
-        setLoading(false);
       } catch (err) {
         console.error('Error fetching wallet:', err);
         setError('Failed to load wallet. Please try again later.');
+      } finally {
         setLoading(false);
       }
     }
-
     fetchWallet();
   }, [params.walletId]);
 
   if (loading) {
     return (
-      <div className="fixed inset-0 bg-gray-100/75 dark:bg-gray-900/75 flex justify-center items-center z-50">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-24 w-24 border-t-4 border-b-4 border-blue-600 dark:border-blue-400 mx-auto"></div>
-          <p className="mt-4 text-xl font-semibold text-gray-800 dark:text-gray-200">Loading wallet...</p>
-        </div>
+      <div className="flex justify-center items-center h-screen">
+        <Spinner size="lg" />
       </div>
     );
   }
 
-  if (error) {
-    return <div>Error: {error}</div>;
-  }
-
-  if (!wallet) {
-    return <div>Wallet not found</div>;
+  if (error || !wallet) {
+    return (
+      <Card className="max-w-2xl mx-auto mt-8">
+        <CardBody>
+          <p className="text-danger">{error || 'Wallet not found'}</p>
+        </CardBody>
+      </Card>
+    );
   }
 
   const totalBalancePages = Math.ceil(Object.keys(wallet.balances).length / balancesPerPage);
+  const startIndex = (currentPage - 1) * balancesPerPage;
+  const endIndex = startIndex + balancesPerPage;
+  const currentBalances = Object.entries(wallet.balances).slice(startIndex, endIndex);
 
-  const goToPage = (page: number) => {
+  const handlePageChange = (page: number) => {
     setCurrentPage(page);
   };
 
-  const handleBalancesPerPageChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const newBalancesPerPage = parseInt(event.target.value, 10);
-    setBalancesPerPage(newBalancesPerPage);
-    setCurrentPage(1);
+  const handleBalancesPerPageChange = (key: string) => {
+    setBalancesPerPage(Number(key));
+    setCurrentPage(1); // Reset to first page when changing items per page
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 p-8 font-sans">
-      <main className="max-w-4xl mx-auto">
-        <Link href="/" className="inline-flex items-center text-primary hover:text-primary/80 mb-8 transition duration-300 ease-in-out">
-          <ArrowLeft size={20} className="mr-2" />
-          <span>Back to Wallets</span>
-        </Link>
-        
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-8">
-          <h1 className="text-3xl font-bold mb-6 text-gray-800 dark:text-gray-100 flex items-center">
-            <Wallet size={32} className="mr-3 text-primary" />
-            Wallet {params.walletId}
-          </h1>
-          <div className="flex flex-col sm:flex-row gap-4 text-sm">
-            <div className="flex-1">
-              <span className="font-semibold text-gray-700 dark:text-gray-200">Network:</span>
-              <span className="ml-2 text-gray-600 dark:text-gray-300">{wallet.network}</span>
-            </div>
-            <div className="flex-1">
-              <div className="font-semibold text-gray-700 dark:text-gray-200">Default Address:</div>
-              <div className="text-gray-600 dark:text-gray-300 break-all mt-1">
-                {wallet.addresses.length > 0 && wallet.defaultAddress ? wallet.defaultAddress : 'N/A'}
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-semibold text-gray-700 dark:text-gray-200">Balances</h2>
-          <div className="flex items-center space-x-2">
-            <label htmlFor="balancesPerPage" className="text-gray-700 dark:text-gray-300">Items per page:</label>
-            <select
-              id="balancesPerPage"
-              value={balancesPerPage}
-              onChange={handleBalancesPerPageChange}
-              className="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-md px-2 py-1"
-            >
-              {BALANCES_PER_PAGE_OPTIONS.map(option => (
-                <option key={option} value={option}>{option}</option>
-              ))}
-            </select>
-          </div>
-        </div>
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden mb-6">
-          <table className="w-full border-collapse">
-            <thead>
-              <tr className="bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-200 text-sm uppercase">
-                <th className="p-3 text-left font-semibold">Currency</th>
-                <th className="p-3 text-left font-semibold">Amount</th>
-              </tr>
-            </thead>
-            <tbody>
-              {Object.entries(wallet.balances).map(([currency, amount], index) => (
-                <tr key={currency} className={`border-b border-gray-300 dark:border-gray-600 ${index % 2 === 0 ? 'bg-gray-50 dark:bg-gray-800' : 'bg-white dark:bg-gray-900'}`}>
-                  <td className="p-3 font-medium text-gray-700 dark:text-gray-300">{currency}</td>
-                  <td className="p-3 text-gray-600 dark:text-gray-300">{amount}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+    <div className="container max-w-4xl mx-auto p-4 space-y-6">
+      <Link href="/" className="inline-flex items-center text-blue-600 hover:text-blue-800 mb-4">
+        <ArrowLeft className="mr-2" size={20} />
+        <span>Back to Wallets</span>
+      </Link>
 
-        {/* Balances Pagination */}
-        <div className="flex justify-center items-center space-x-2 mb-8">
-          <button
-            onClick={() => goToPage(currentPage - 1)}
-            disabled={currentPage === 1}
-            className="p-2 rounded-md bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 disabled:opacity-50"
-          >
-            <ChevronLeft size={20} />
-          </button>
-          {Array.from({ length: totalBalancePages }, (_, i) => i + 1).map((page) => (
-            <button
-              key={page}
-              onClick={() => goToPage(page)}
-              className={`px-3 py-1 rounded-md ${
-                currentPage === page
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300'
-              }`}
+      <Card className="border border-gray-200 shadow-sm">
+        <CardHeader className="flex justify-between items-center px-6 py-4 bg-gray-50">
+          <div className="flex items-center gap-3">
+            <Wallet size={24} className="text-blue-600" />
+            <div>
+              <h1 className="text-lg text-gray-800 dark:text-gray-800 font-semibold">Wallet Details</h1>
+              <p className="text-sm text-gray-500">ID: {params.walletId}</p>
+            </div>
+          </div>
+        </CardHeader>
+        <CardBody className="px-6 py-4">
+          <div className="grid grid-cols-2 gap-6">
+            <div>
+              <p className="text-sm font-medium text-gray-500 dark:text-gray-800 mb-1">Network</p>
+              <p className="text-base text-gray-500 dark:text-gray-800 ">{wallet.network}</p>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-gray-500 mb-1">Default Address</p>
+              <p className="text-sm text-gray-500 dark:text-gray-800 ">{wallet.defaultAddress || 'N/A'}</p>
+            </div>
+          </div>
+        </CardBody>
+      </Card>
+
+      <Card className="shadow-sm">
+        <CardHeader className="flex justify-between items-center px-6 py-4">
+          <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-800">Balances</h2>
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-gray-500 dark:text-gray-800">Items per page:</span>
+            <Dropdown onOpenChange={setIsDropdownOpen}>
+              <DropdownTrigger>
+                <Button 
+                  variant="light" 
+                  className={`min-w-[70px] border transition-colors ${
+                    isDropdownOpen
+                      ? 'bg-blue-100 border-blue-600 text-blue-600'
+                      : 'bg-transparent border-gray-300 hover:border-blue-600 text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-gray-200'
+                  }`}
+                >
+                  {balancesPerPage}
+                </Button>
+              </DropdownTrigger>
+              <DropdownMenu 
+                aria-label="Balances per page"
+                onAction={(key) => handleBalancesPerPageChange(key.toString())}
+              >
+                {BALANCES_PER_PAGE_OPTIONS.map((option) => (
+                  <DropdownItem key={option}>{option}</DropdownItem>
+                ))}
+              </DropdownMenu>
+            </Dropdown>
+          </div>
+        </CardHeader>
+        <CardBody className="px-6 py-4">
+          <Table aria-label="Balances table" className="min-w-full text-gray-800 dark:text-gray-800">
+            <TableHeader>
+              <TableColumn className="text-left">CURRENCY</TableColumn>
+              <TableColumn className="text-right">AMOUNT</TableColumn>
+            </TableHeader>
+            <TableBody>
+              {currentBalances.map(([currency, amount]) => (
+                <TableRow key={currency}>
+                  <TableCell className="text-left">{currency}</TableCell>
+                  <TableCell className="text-right">{amount}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+          <div className="flex justify-center items-center gap-2 mt-4">
+            <Button
+              isIconOnly
+              aria-label="Previous page"
+              variant="light"
+              isDisabled={currentPage === 1}
+              onPress={() => handlePageChange(currentPage - 1)}
             >
-              {page}
-            </button>
-          ))}
-          <button
-            onClick={() => goToPage(currentPage + 1)}
-            disabled={currentPage === totalBalancePages}
-            className="p-2 rounded-md bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 disabled:opacity-50"
-          >
-            <ChevronRight size={20} />
-          </button>
-        </div>
-        
-        <h2 className="text-2xl font-semibold mb-4 mt-8 text-gray-700 dark:text-gray-200">Addresses</h2>
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
-          <table className="w-full border-collapse">
-            <thead>
-              <tr className="bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-200 text-sm uppercase">
-                <th className="p-3 text-left font-semibold">Index</th>
-                <th className="p-3 text-left font-semibold">Address</th>
-              </tr>
-            </thead>
-            <tbody>
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            {Array.from({ length: totalBalancePages }, (_, i) => i + 1).map((page) => (
+              <Button
+                key={page}
+                size="sm"
+                variant={currentPage === page ? "solid" : "light"}
+                onPress={() => handlePageChange(page)}
+                className={`w-8 h-8 text-sm ${
+                  currentPage === page ? "bg-blue-600 text-white" : "text-gray-700"
+                }`}
+              >
+                {page}
+              </Button>
+            ))}
+            <Button
+              isIconOnly
+              aria-label="Next page"
+              variant="light"
+              isDisabled={currentPage === totalBalancePages}
+              onPress={() => handlePageChange(currentPage + 1)}
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+        </CardBody>
+      </Card>
+
+      <Card className="shadow-sm">
+        <CardHeader className="px-6 py-4">
+          <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-800">Addresses</h2>
+        </CardHeader>
+        <CardBody className="px-6 py-4">
+          <Table aria-label="Addresses table" className="min-w-full">
+            <TableHeader>
+              <TableColumn className="w-1/6 text-gray-800 dark:text-gray-800">INDEX</TableColumn>
+              <TableColumn className="text-gray-800 dark:text-gray-800">ADDRESS</TableColumn>
+            </TableHeader>
+            <TableBody>
               {wallet.addresses.map((address, index) => (
-                <tr key={index} className={`border-b border-gray-300 dark:border-gray-600 ${index % 2 === 0 ? 'bg-gray-50 dark:bg-gray-800' : 'bg-white dark:bg-gray-900'}`}>
-                  <td className="p-3 font-medium text-gray-700 dark:text-gray-300">{index}</td>
-                  <td className="p-3 text-gray-600 dark:text-gray-300 break-all">
+                <TableRow key={index}>
+                  <TableCell className="text-gray-800 dark:text-gray-800">{index}</TableCell>
+                  <TableCell>
                     <Link 
                       href={`/wallets/${wallet.id}/addresses/${address}`}
-                      className="text-primary hover:text-primary/80 hover:underline transition duration-300 ease-in-out"
+                      className="text-blue-600 hover:text-blue-800 hover:underline text-blue-600 cursor-pointer dark:text-blue-800"
                     >
                       {address}
                     </Link>
-                    {address === wallet.defaultAddress && " (default)"}
-                  </td>
-                </tr>
+                    {address === wallet.defaultAddress && (
+                      <span className="ml-2 text-xs bg-blue-100 text-blue-800 py-1 px-2 rounded-full dark:bg-blue-900 dark:text-blue-400">
+                        Default
+                      </span>
+                    )}
+                  </TableCell>
+                </TableRow>
               ))}
-            </tbody>
-          </table>
-        </div>
-      </main>
+            </TableBody>
+          </Table>
+        </CardBody>
+      </Card>
     </div>
   );
 }

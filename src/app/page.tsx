@@ -1,77 +1,45 @@
 'use client'
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import { WalletListResponse } from "./api/wallets/route";
-import React from 'react';
 import { useRouter } from 'next/navigation';
+import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Button, Card, CardBody, CardHeader, Spinner } from "@nextui-org/react";
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@nextui-org/react";
+import { Selection } from "@nextui-org/react";
+import { ChevronDownIcon } from '@heroicons/react/20/solid';
+import { WalletListResponse } from "./api/wallets/route";
+import { ChevronLeft, ChevronRight, Wallet } from "lucide-react";
 
 const WALLETS_PER_PAGE_OPTIONS = [10, 20, 50, 100];
-// TODO: Load this from CDP SDK.
 const SUPPORTED_NETWORKS = ['base-sepolia', 'base-mainnet'];
 
 export default function Home() {
   const [wallets, setWallets] = useState<WalletListResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [selectedNetwork, setSelectedNetwork] = useState<Selection>(new Set([SUPPORTED_NETWORKS[0]]));
   const [walletsPerPage, setWalletsPerPage] = useState(WALLETS_PER_PAGE_OPTIONS[0]);
-  const [selectedNetwork, setSelectedNetwork] = useState('');
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isNetworkDropdownOpen, setIsNetworkDropdownOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
   const router = useRouter();
 
   useEffect(() => {
-    async function fetchWallets() {
-      try {
-        // const cachedData = localStorage.getItem('walletsData');
-        // const cachedTimestamp = localStorage.getItem('walletsTimestamp');
-        //
-        // if (cachedData && cachedTimestamp) {
-        //   const parsedData = JSON.parse(cachedData);
-        //   const timestamp = parseInt(cachedTimestamp, 10);
-        //
-        //   if (Date.now() - timestamp < CACHE_DURATION) {
-        //     setWallets(parsedData);
-        //     setLoading(false);
-        //     return;
-        //   }
-        // }
-
-        const response = await fetch('/api/wallets');
-        if (!response.ok) {
-          throw new Error('Failed to fetch wallets');
-        }
-        const data = await response.json();
-        setWallets(data);
-        setLoading(false);
-        
-        // localStorage.setItem('walletsData', JSON.stringify(data));
-        // localStorage.setItem('walletsTimestamp', Date.now().toString());
-      } catch (err) {
-        console.error('Error fetching wallets:', err);
-        setError('Failed to load wallets. Please try again later.');
-        setLoading(false);
-      }
-    }
-
     fetchWallets();
   }, []);
 
-  const totalPages = Math.ceil(wallets.length / walletsPerPage);
-  const startIndex = (currentPage - 1) * walletsPerPage;
-  const endIndex = startIndex + walletsPerPage;
-  const currentWallets = wallets.slice(startIndex, endIndex);
-
-  const goToPage = (page: number) => {
-    setCurrentPage(page);
-  };
-
-  const handleWalletsPerPageChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    console.log("handleWalletsPerPageChange")
-    const newWalletsPerPage = parseInt(event.target.value, 10);
-    setWalletsPerPage(newWalletsPerPage);
-    setCurrentPage(1);
-  };
+  async function fetchWallets() {
+    try {
+      const response = await fetch('/api/wallets');
+      if (!response.ok) throw new Error('Failed to fetch wallets');
+      const data = await response.json();
+      setWallets(data);
+    } catch (err) {
+      console.error('Error fetching wallets:', err);
+      setError('Failed to load wallets. Please try again later.');
+    } finally {
+      setLoading(false);
+    }
+  }
 
   const handleCreateWallet = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -79,172 +47,203 @@ export default function Home() {
     setError('');
 
     try {
-      console.log("Creating wallet for network: ", selectedNetwork);
+      const networkId = Array.from(selectedNetwork)[0] as string;
       const response = await fetch('/api/wallets', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },  
-        body: JSON.stringify({ networkId: selectedNetwork }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ networkId }),
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to create wallet');
-      }
+      if (!response.ok) throw new Error('Failed to create wallet');
 
       const data = await response.json();
-      console.log('Wallet created:', data);
-      
-      // Navigate to the new wallet
       router.push(`/wallets/${data.id}`);
     } catch (err) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError('An unknown error occurred');
-      }
+      setError(err instanceof Error ? err.message : 'An unknown error occurred');
     } finally {
       setLoading(false);
     }
   };
 
+  const columns = [
+    { name: "WALLET ID", uid: "id" },
+    { name: "NETWORK", uid: "network" },
+  ];
+
+  const paginatedWallets = wallets.slice(
+    (currentPage - 1) * walletsPerPage,
+    currentPage * walletsPerPage
+  );
+
+  const totalPages = Math.ceil(wallets.length / walletsPerPage);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
   if (loading) {
     return (
-      <div className="fixed inset-0 bg-gray-100/75 dark:bg-gray-900/75 flex justify-center items-center z-50">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-24 w-24 border-t-4 border-b-4 border-blue-600 dark:border-blue-400 mx-auto"></div>
-          <p className="mt-4 text-xl font-semibold text-gray-800 dark:text-gray-200">Loading wallets...</p>
-        </div>
+      <div className="h-screen flex justify-center items-center">
+        <Spinner size="lg" />
       </div>
     );
   }
 
   if (error) {
-    return <div>Error: {error}</div>;
+    return <div className="text-red-500">{error}</div>;
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 p-8 font-sans">
-      <main className="max-w-4xl mx-auto">
-        <h1 className="text-4xl font-bold mb-8 text-gray-800 dark:text-gray-100">CDP Wallet Manager</h1>
-        
-        <div className="flex justify-end items-center mb-8">
+    <div className="container max-w-4xl mx-auto p-4 space-y-6">
+      <h1 className="text-4xl font-bold mb-8 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-pink-600">CDP Wallet Manager</h1>
+      <Card className="bg-white dark:bg-gray-800">
+        <CardHeader className="flex justify-between items-center">
+          <h2 className="text-2xl font-semibold flex items-center text-gray-800 dark:text-gray-200">
+            <Wallet className="mr-2 h-6 w-6" /> Wallets
+          </h2>
           <div className="flex items-center space-x-2">
-            <label htmlFor="walletsPerPage" className="text-gray-700 dark:text-gray-300">Wallets per page:</label>
-            <select
-              id="walletsPerPage"
-              value={walletsPerPage}
-              onChange={handleWalletsPerPageChange}
-              className="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-md px-2 py-1"
-            >
-              {WALLETS_PER_PAGE_OPTIONS.map(option => (
-                <option key={option} value={option}>{option}</option>
-              ))}
-            </select>
+            <span className="text-sm text-gray-600 dark:text-gray-200">Wallets per page:</span>
+            <Dropdown onOpenChange={setIsDropdownOpen}>
+              <DropdownTrigger>
+                <Button 
+                  variant="light" 
+                  className={`min-w-[70px] border transition-colors ${
+                    isDropdownOpen
+                      ? 'bg-blue-100 border-blue-600 text-blue-600 dark:text-gray-800'
+                      : 'bg-transparent border-gray-300 hover:border-blue-600 text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-gray-200'
+                  }`}
+                >
+                  {walletsPerPage}
+                </Button>
+              </DropdownTrigger>
+              <DropdownMenu 
+                aria-label="Wallets per page"
+                onAction={(key) => setWalletsPerPage(Number(key))}
+              >
+                {WALLETS_PER_PAGE_OPTIONS.map((option) => (
+                  <DropdownItem key={option}>{option}</DropdownItem>
+                ))}
+              </DropdownMenu>
+            </Dropdown>
           </div>
-        </div>
-        
-        <h2 className="text-2xl font-semibold mb-4 text-gray-700 dark:text-gray-200">Wallets</h2>
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden mb-6">
-          <table className="w-full border-collapse">
-            <thead>
-              <tr className="bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-200 text-sm uppercase">
-                <th className="p-3 text-left font-semibold">Wallet ID</th>
-                <th className="p-3 text-left font-semibold">Network</th>
-              </tr>
-            </thead>
-            <tbody>
-              {currentWallets.map((wallet) => (
-                <tr key={wallet.id} className="border-b border-gray-300 dark:border-gray-600">
-                  <td className="p-3">
-                    <Link href={`/wallets/${wallet.id}`} className="text-primary hover:text-primary/80 font-medium">
-                      {wallet.id}
-                    </Link>
-                  </td>
-                  <td className="p-3 text-gray-600 dark:text-gray-300">{wallet.network}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        {/* Pagination */}
-        <div className="flex justify-center items-center space-x-2">
-          <button
-            onClick={() => goToPage(currentPage - 1)}
-            disabled={currentPage === 1}
-            className="p-2 rounded-md bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 disabled:opacity-50"
+        </CardHeader>
+        <CardBody>
+          <Table 
+            aria-label="Wallets table"
+            classNames={{
+              base: "max-w-full",
+              table: "min-w-full border-collapse border border-gray-200 dark:border-gray-700",
+              thead: "bg-gray-100 dark:bg-gray-700",
+              tbody: "bg-white dark:bg-gray-900",
+              tr: "border-b border-gray-200 dark:border-gray-700",
+              th: "text-left p-3 text-gray-800 dark:text-gray-200 font-semibold",
+              td: "p-3 text-gray-800 dark:text-gray-200",
+            }}
           >
-            <ChevronLeft size={20} />
-          </button>
+            <TableHeader>
+              {columns.map((column) => (
+                <TableColumn key={column.uid} className="text-gray-800 dark:text-gray-800 font-semibold">
+                  {column.name}
+                </TableColumn>
+              ))}
+            </TableHeader>
+            <TableBody>
+              {paginatedWallets.map((wallet) => (
+                <TableRow key={wallet.id}>
+                  <TableCell>
+                    <span 
+                      className="text-blue-600 cursor-pointer dark:text-gray-200" 
+                      onClick={() => router.push(`/wallets/${wallet.id}`)}
+                    >
+                      {wallet.id}
+                    </span>
+                  </TableCell>
+                  <TableCell>{wallet.network}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
           
-          {Array.from({ length: totalPages }, (_, i) => i + 1)
-            .filter(page => {
-              if (totalPages <= 10) return true;
-              if (page === 1 || page === totalPages) return true;
-              if (page >= currentPage - 2 && page <= currentPage + 2) return true;
-              if (page === 2 || page === totalPages - 1) return true;
-              return false;
-            })
-            .map((page, index, array) => (
-              <React.Fragment key={page}>
-                {index > 0 && array[index - 1] !== page - 1 && (
-                  <span className="px-2 text-gray-400">...</span>
-                )}
-                <button
-                  onClick={() => goToPage(page)}
-                  className={`px-3 py-1 rounded-md ${
-                    currentPage === page
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300'
+          <div className="flex justify-between items-center mt-6">
+            <div className="flex justify-center items-center gap-2">
+              <Button
+                isIconOnly
+                aria-label="Previous page"
+                variant="light"
+                isDisabled={currentPage === 1}
+                onPress={() => handlePageChange(currentPage - 1)}
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                <Button
+                  key={page}
+                  size="sm"
+                  variant={currentPage === page ? "solid" : "light"}
+                  onPress={() => handlePageChange(page)}
+                  className={`w-8 h-8 text-sm ${
+                    currentPage === page ? "bg-blue-600 text-white" : "text-gray-700"
                   }`}
                 >
                   {page}
-                </button>
-              </React.Fragment>
-            ))}
-          
-          <button
-            onClick={() => goToPage(currentPage + 1)}
-            disabled={currentPage === totalPages}
-            className="p-2 rounded-md bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 disabled:opacity-50"
-          >
-            <ChevronRight size={20} />
-          </button>
-        </div>
-        <div className="mt-8">
-          <h2 className="text-2xl font-semibold mb-4">Create New Wallet</h2>
-          <form onSubmit={handleCreateWallet} className="space-y-4">
-            <div>
-              <label htmlFor="network" className="block text-sm font-medium text-gray-700">
-                Select Network
-              </label>
-              <select
-                id="network"
-                value={selectedNetwork}
-                onChange={(e) => setSelectedNetwork(e.target.value)}
-                required
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                </Button>
+              ))}
+              <Button
+                isIconOnly
+                aria-label="Next page"
+                variant="light"
+                isDisabled={currentPage === totalPages}
+                onPress={() => handlePageChange(currentPage + 1)}
               >
-                <option value="">Select a network</option>
-                {SUPPORTED_NETWORKS.map((network) => (
-                  <option key={network} value={network}>
-                    {network}
-                  </option>
-                ))}
-              </select>
+                <ChevronRight className="h-4 w-4" />
+              </Button>
             </div>
-            <button
-              type="submit"
-              disabled={loading || !selectedNetwork}
-              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:bg-gray-400 disabled:cursor-not-allowed"
-            >
-              {loading ? 'Creating...' : 'Create Wallet'}
-            </button>
-          </form>
-          {error && <p className="mt-2 text-red-600">{error}</p>}
-        </div>
-      </main>
+            <div className="flex items-center space-x-4">
+              <Dropdown onOpenChange={setIsNetworkDropdownOpen}>
+                <DropdownTrigger>
+                  <Button 
+                    variant="bordered" 
+                    className={`min-w-[70px] border transition-colors ${
+                      isNetworkDropdownOpen
+                      ? 'bg-blue-100 border-blue-600 text-blue-600'
+                      : 'bg-transparent border-gray-300 hover:border-blue-600 text-gray-700 hover:text-blue-600 dark:text-gray-200'
+                    }`}
+                    endContent={<ChevronDownIcon className="h-4 w-4" />}
+                  >
+                    {Array.from(selectedNetwork)[0] || "Select Network"}
+                  </Button>
+                </DropdownTrigger>
+                <DropdownMenu
+                  aria-label="Select Network"
+                  disallowEmptySelection
+                  selectionMode="single"
+                  selectedKeys={selectedNetwork}
+                  onSelectionChange={setSelectedNetwork}
+                  className="bg-white dark:bg-gray-800"
+                >
+                  {SUPPORTED_NETWORKS.map((network) => (
+                    <DropdownItem 
+                      key={network} 
+                    >
+                      {network}
+                    </DropdownItem>
+                  ))}
+                </DropdownMenu>
+              </Dropdown>
+              <Button
+                color="primary"
+                className="text-sm text-white bg-blue-600 hover:bg-blue-700"
+                disabled={loading || (selectedNetwork !== "all" && selectedNetwork.size === 0)}
+                onClick={handleCreateWallet}
+              >
+                {loading ? <Spinner size="sm" /> : 'Create Wallet'}
+              </Button>
+            </div>
+          </div>
+        </CardBody>
+      </Card>
+      
+      {error && <p className="text-red-500 dark:text-red-400 mt-4 text-sm">{error}</p>}
     </div>
   );
 }
