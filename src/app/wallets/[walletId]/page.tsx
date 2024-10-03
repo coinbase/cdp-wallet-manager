@@ -85,7 +85,7 @@ export default function WalletPage({ params }: { params: { walletId: string } })
           <div className="flex items-center gap-3">
             <Wallet size={24} className="text-blue-600" />
             <div>
-              <h1 className="text-xl font-semibold">Wallet Details</h1>
+              <h1 className="text-lg text-gray-800 dark:text-gray-200 font-semibold">Wallet Details</h1>
               <p className="text-sm text-gray-500">ID: {params.walletId}</p>
             </div>
           </div>

@@ -97,8 +97,8 @@ export default function Home() {
     <div className="container max-w-4xl mx-auto p-4 space-y-6">
       <h1 className="text-4xl font-bold mb-8 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-pink-600">CDP Wallet Manager</h1>
       <Card>
-      <CardHeader className="flex justify-between items-center">
-          <h2 className="text-2xl font-semibold flex items-center">
+        <CardHeader className="flex justify-between items-center">
+          <h2 className="text-2xl font-semibold flex items-center text-gray-800 dark:text-gray-200">
             <Wallet className="mr-2 h-6 w-6" /> Wallets
           </h2>
           <div className="flex items-center space-x-2">
@@ -131,7 +131,9 @@ export default function Home() {
           <Table aria-label="Wallets table">
             <TableHeader>
               {columns.map((column) => (
-                <TableColumn key={column.uid}>{column.name}</TableColumn>
+                <TableColumn key={column.uid} className="text-gray-800 dark:text-gray-200 font-semibold">
+                  {column.name}
+                </TableColumn>
               ))}
             </TableHeader>
             <TableBody>

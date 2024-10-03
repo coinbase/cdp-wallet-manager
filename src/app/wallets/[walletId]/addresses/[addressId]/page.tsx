@@ -158,7 +158,7 @@ export default function AddressPage({ params }: { params: { walletId: string, ad
           <div className="flex items-center gap-3">
             <CreditCard size={24} className="text-blue-600" />
             <div>
-              <h1 className="text-xl font-semibold">Address Details</h1>
+              <h1 className="text-lg text-gray-800 dark:text-gray-200 font-semibold">Address Details</h1>
               <p className="text-sm text-gray-500">ID: {address.id}</p>
             </div>
           </div>
