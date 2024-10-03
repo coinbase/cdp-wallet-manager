@@ -36,7 +36,7 @@ docker run --name test-postgres -e POSTGRES_PASSWORD=password -e POSTGRES_DB=see
 Set up the Prisma schema in the DB
 
 ```bash
-npm run db:push
+npm run db:setup
 ```
 
 ### Run the app
