@@ -7,7 +7,7 @@ import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@nextui-o
 import { Selection } from "@nextui-org/react";
 import { ChevronDownIcon } from '@heroicons/react/20/solid';
 import { WalletListResponse } from "./api/wallets/route";
-import { ChevronLeft, ChevronRight, Wallet, Plus } from "lucide-react";
+import { ChevronLeft, ChevronRight, Wallet } from "lucide-react";
 
 const WALLETS_PER_PAGE_OPTIONS = [10, 20, 50, 100];
 const SUPPORTED_NETWORKS = ['base-sepolia', 'base-mainnet'];

@@ -45,6 +45,7 @@ export default function AddressPage({ params }: { params: { walletId: string, ad
 
   useEffect(() => {
     fetchAddress();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.walletId, params.addressId]);
 
   const handleFaucetRequest = async () => {
