@@ -16,9 +16,10 @@ export default function Home() {
   const [wallets, setWallets] = useState<WalletListResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedNetwork, setSelectedNetwork] = useState<Selection>(new Set([]));
+  const [selectedNetwork, setSelectedNetwork] = useState<Selection>(new Set([SUPPORTED_NETWORKS[0]]));
   const [walletsPerPage, setWalletsPerPage] = useState(WALLETS_PER_PAGE_OPTIONS[0]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isNetworkDropdownOpen, setIsNetworkDropdownOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const router = useRouter();
 
@@ -185,14 +186,18 @@ export default function Home() {
               </Button>
             </div>
             <div className="flex items-center space-x-4">
-              <Dropdown>
+              <Dropdown onOpenChange={setIsNetworkDropdownOpen}>
                 <DropdownTrigger>
                   <Button 
                     variant="bordered" 
-                    className="text-sm"
+                    className={`min-w-[70px] border transition-colors ${
+                      isNetworkDropdownOpen
+                      ? 'bg-blue-100 border-blue-600 text-blue-600'
+                      : 'bg-transparent border-gray-300 hover:border-blue-600 text-gray-700 hover:text-blue-600'
+                    }`}
                     endContent={<ChevronDownIcon className="h-4 w-4" />}
                   >
-                    {selectedNetwork !== "all" ? selectedNetwork : "Select Network"}
+                    {Array.from(selectedNetwork)[0] || "Select Network"}
                   </Button>
                 </DropdownTrigger>
                 <DropdownMenu
@@ -204,7 +209,9 @@ export default function Home() {
                   className="bg-white dark:bg-gray-800"
                 >
                   {SUPPORTED_NETWORKS.map((network) => (
-                    <DropdownItem key={network} className="text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <DropdownItem 
+                      key={network} 
+                    >
                       {network}
                     </DropdownItem>
                   ))}

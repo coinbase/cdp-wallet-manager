@@ -103,7 +103,7 @@ export default function AddressPage({ params }: { params: { walletId: string, ad
       }
 
       const data = await response.json();
-      setTransferSuccess('Transfer created successfully: ' + data.transactionLink);
+      setTransferSuccess(data.transactionLink);
 
       setDestinationAddress('');
       setAmount('');
@@ -317,7 +317,19 @@ export default function AddressPage({ params }: { params: { walletId: string, ad
               </Button>
             </form>
             {transferError && <p className="text-danger mt-2">{transferError}</p>}
-            {transferSuccess && <p className="text-success mt-2">{transferSuccess}</p>}
+            {transferSuccess && (
+            <div>
+              <strong>Transaction Link:</strong>{' '}
+              <Link 
+                href={transferSuccess} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-blue-600 hover:underline"
+              >
+                View Transaction
+              </Link>
+            </div>
+            )}
           </CardBody>
         </Card>
       </div>
