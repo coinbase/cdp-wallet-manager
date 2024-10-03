@@ -7,7 +7,7 @@ import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@nextui-o
 import { Selection } from "@nextui-org/react";
 import { ChevronDownIcon } from '@heroicons/react/20/solid';
 import { WalletListResponse } from "./api/wallets/route";
-import { ChevronLeft, ChevronRight, Wallet } from "lucide-react";
+import { ChevronLeft, ChevronRight, Wallet, Plus } from "lucide-react";
 
 const WALLETS_PER_PAGE_OPTIONS = [10, 20, 50, 100];
 const SUPPORTED_NETWORKS = ['base-sepolia', 'base-mainnet'];
@@ -19,8 +19,9 @@ export default function Home() {
   const [selectedNetwork, setSelectedNetwork] = useState<Selection>(new Set([SUPPORTED_NETWORKS[0]]));
   const [walletsPerPage, setWalletsPerPage] = useState(WALLETS_PER_PAGE_OPTIONS[0]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [isNetworkDropdownOpen, setIsNetworkDropdownOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [createWalletLoading, setCreateWalletLoading] = useState(false);
+  const [createWalletError, setCreateWalletError] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -41,10 +42,9 @@ export default function Home() {
     }
   }
 
-  const handleCreateWallet = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
+  const handleCreateWallet = async () => {
+    setCreateWalletLoading(true);
+    setCreateWalletError(null);
 
     try {
       const networkId = Array.from(selectedNetwork)[0] as string;
@@ -59,9 +59,9 @@ export default function Home() {
       const data = await response.json();
       router.push(`/wallets/${data.id}`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An unknown error occurred');
+      setCreateWalletError(err instanceof Error ? err.message : 'An unknown error occurred');
     } finally {
-      setLoading(false);
+      setCreateWalletLoading(false);
     }
   };
 
@@ -96,6 +96,7 @@ export default function Home() {
   return (
     <div className="container max-w-4xl mx-auto p-4 space-y-6">
       <h1 className="text-4xl font-bold mb-8 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-pink-600">CDP Wallet Manager</h1>
+      
       <Card className="bg-white dark:bg-gray-800">
         <CardHeader className="flex justify-between items-center">
           <h2 className="text-2xl font-semibold flex items-center text-gray-800 dark:text-gray-200">
@@ -164,86 +165,85 @@ export default function Home() {
             </TableBody>
           </Table>
           
-          <div className="flex justify-between items-center mt-6">
-            <div className="flex justify-center items-center gap-2">
+          <div className="flex justify-center items-center mt-6">
+            <Button
+              isIconOnly
+              aria-label="Previous page"
+              variant="light"
+              isDisabled={currentPage === 1}
+              onPress={() => handlePageChange(currentPage - 1)}
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
               <Button
-                isIconOnly
-                aria-label="Previous page"
-                variant="light"
-                isDisabled={currentPage === 1}
-                onPress={() => handlePageChange(currentPage - 1)}
+                key={page}
+                size="sm"
+                variant={currentPage === page ? "solid" : "light"}
+                onPress={() => handlePageChange(page)}
+                className={`w-8 h-8 text-sm ${
+                  currentPage === page ? "bg-blue-600 text-white" : "text-gray-700"
+                }`}
               >
-                <ChevronLeft className="h-4 w-4" />
+                {page}
               </Button>
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                <Button
-                  key={page}
-                  size="sm"
-                  variant={currentPage === page ? "solid" : "light"}
-                  onPress={() => handlePageChange(page)}
-                  className={`w-8 h-8 text-sm ${
-                    currentPage === page ? "bg-blue-600 text-white" : "text-gray-700"
-                  }`}
-                >
-                  {page}
-                </Button>
-              ))}
-              <Button
-                isIconOnly
-                aria-label="Next page"
-                variant="light"
-                isDisabled={currentPage === totalPages}
-                onPress={() => handlePageChange(currentPage + 1)}
-              >
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-            </div>
-            <div className="flex items-center space-x-4">
-              <Dropdown onOpenChange={setIsNetworkDropdownOpen}>
-                <DropdownTrigger>
-                  <Button 
-                    variant="bordered" 
-                    className={`min-w-[70px] border transition-colors ${
-                      isNetworkDropdownOpen
-                      ? 'bg-blue-100 border-blue-600 text-blue-600'
-                      : 'bg-transparent border-gray-300 hover:border-blue-600 text-gray-700 hover:text-blue-600 dark:text-gray-200'
-                    }`}
-                    endContent={<ChevronDownIcon className="h-4 w-4" />}
-                  >
-                    {Array.from(selectedNetwork)[0] || "Select Network"}
-                  </Button>
-                </DropdownTrigger>
-                <DropdownMenu
-                  aria-label="Select Network"
-                  disallowEmptySelection
-                  selectionMode="single"
-                  selectedKeys={selectedNetwork}
-                  onSelectionChange={setSelectedNetwork}
-                  className="bg-white dark:bg-gray-800"
-                >
-                  {SUPPORTED_NETWORKS.map((network) => (
-                    <DropdownItem 
-                      key={network} 
-                    >
-                      {network}
-                    </DropdownItem>
-                  ))}
-                </DropdownMenu>
-              </Dropdown>
-              <Button
-                color="primary"
-                className="text-sm text-white bg-blue-600 hover:bg-blue-700"
-                disabled={loading || (selectedNetwork !== "all" && selectedNetwork.size === 0)}
-                onClick={handleCreateWallet}
-              >
-                {loading ? <Spinner size="sm" /> : 'Create Wallet'}
-              </Button>
-            </div>
+            ))}
+            <Button
+              isIconOnly
+              aria-label="Next page"
+              variant="light"
+              isDisabled={currentPage === totalPages}
+              onPress={() => handlePageChange(currentPage + 1)}
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
           </div>
         </CardBody>
       </Card>
       
-      {error && <p className="text-red-500 dark:text-red-400 mt-4 text-sm">{error}</p>}
+      <Card className="bg-white dark:bg-gray-800">
+        <CardHeader className="flex justify-between items-center">
+          <h2 className="text-2xl font-semibold flex items-center text-gray-800 dark:text-gray-200">
+            Create New Wallet
+          </h2>
+        </CardHeader>
+        <CardBody>
+          <div className="flex items-center space-x-4">
+            <Dropdown>
+              <DropdownTrigger>
+                <Button 
+                  variant="bordered" 
+                  className="min-w-[150px] border transition-colors bg-transparent border-gray-300 hover:border-blue-600 text-gray-700 hover:text-blue-600 dark:text-gray-200"
+                  endContent={<ChevronDownIcon className="h-4 w-4" />}
+                >
+                  {Array.from(selectedNetwork)[0] || "Select Network"}
+                </Button>
+              </DropdownTrigger>
+              <DropdownMenu
+                aria-label="Select Network"
+                disallowEmptySelection
+                selectionMode="single"
+                selectedKeys={selectedNetwork}
+                onSelectionChange={setSelectedNetwork}
+                className="bg-white dark:bg-gray-800"
+              >
+                {SUPPORTED_NETWORKS.map((network) => (
+                  <DropdownItem key={network}>{network}</DropdownItem>
+                ))}
+              </DropdownMenu>
+            </Dropdown>
+            <Button
+              color="primary"
+              className="text-sm text-white bg-blue-600 hover:bg-blue-700"
+              disabled={createWalletLoading || (selectedNetwork !== "all" && selectedNetwork.size === 0)}
+              onClick={handleCreateWallet}
+            >
+              {createWalletLoading ? <Spinner size="sm" /> : 'Create Wallet'}
+            </Button>
+          </div>
+          {createWalletError && <p className="text-red-500 dark:text-red-400 mt-4 text-sm">{createWalletError}</p>}
+        </CardBody>
+      </Card>
     </div>
   );
 }

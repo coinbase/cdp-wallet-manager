@@ -97,12 +97,12 @@ export default function AddressPage({ params }: { params: { walletId: string, ad
         }),
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to create transfer');
+        throw new Error(data.error || data.message || 'Failed to create transfer');
       }
 
-      const data = await response.json();
       setTransferSuccess(data.transactionLink);
 
       setDestinationAddress('');
@@ -141,10 +141,15 @@ export default function AddressPage({ params }: { params: { walletId: string, ad
     return <div className="text-danger">{error || 'Address not found'}</div>;
   }
 
-  const totalBalancePages = Math.ceil(Object.keys(address.balances).length / balancesPerPage);
+  const totalBalancePages = Math.ceil(Math.max(Object.keys(address?.balances || {}).length, 1) / balancesPerPage);
   const startIndex = (currentPage - 1) * balancesPerPage;
   const endIndex = startIndex + balancesPerPage;
-  const currentBalances = Object.entries(address.balances).slice(startIndex, endIndex);
+  let currentBalances = Object.entries(address?.balances || {}).slice(startIndex, endIndex);
+  
+  // Add empty ETH balance if no balances exist
+  if (currentBalances.length === 0) {
+    currentBalances = [['eth', 0]];
+  }
 
   return (
     <div className="container max-w-4xl mx-auto p-4 space-y-6">
@@ -316,19 +321,28 @@ export default function AddressPage({ params }: { params: { walletId: string, ad
                 {transferLoading ? 'Creating Transfer...' : 'Create Transfer'}
               </Button>
             </form>
-            {transferError && <p className="text-danger mt-2">{transferError}</p>}
+            {transferError && (
+              <div className="mt-2 text-danger">
+                <p>{transferError}</p>
+                {transferError.toLowerCase().includes("insufficient funds") && (
+                  <p className="mt-1">
+                    Use the <Link href="#faucet-section" className="text-blue-600 hover:underline">faucet</Link> to get ETH.
+                  </p>
+                )}
+              </div>
+            )}
             {transferSuccess && (
-            <div>
-              <strong>Transaction Link:</strong>{' '}
-              <Link 
-                href={transferSuccess} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-blue-600 hover:underline"
-              >
-                View Transaction
-              </Link>
-            </div>
+              <div className="mt-2">
+                <strong>Transaction Link:</strong>{' '}
+                <Link 
+                  href={transferSuccess} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-blue-600 hover:underline"
+                >
+                  View Transaction
+                </Link>
+              </div>
             )}
           </CardBody>
         </Card>

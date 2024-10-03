@@ -40,38 +40,48 @@ export async function POST(request: Request, { params }: { params: { walletId: s
   
       wallet.setSeed(seed as string);
 
-        // Get the address object
-        const addresses = await wallet.listAddresses()
+      // Get the address object
+      const addresses = await wallet.listAddresses()
 
-        const address = addresses.find(addr => addr.getId() === params.addressId);
+      const address = addresses.find(addr => addr.getId() === params.addressId);
 
-        if (!address) {
-            return NextResponse.json({ error: 'Address not found' }, { status: 404 });
-        }
+      if (!address) {
+          return NextResponse.json({ error: 'Address not found' }, { status: 404 });
+      }
 
+      try {
         const transfer = await address.createTransfer({
-        amount: numAmount,
-        assetId: asset,
-        destination: destination_address,
-     });
+          amount: numAmount,
+          assetId: asset,
+          destination: destination_address,
+        });
 
-     await transfer.wait();
+        await transfer.wait();
 
-    if (transfer.getStatus() === 'complete') {
-        console.log(`Transfer successfully completed: `, transfer.toString());
-    } else {
-        return NextResponse.json({
-            success: false,
-            error: 'transaction not complete'
-        }, {status: 500 });
-    }
-  
-      return NextResponse.json({
-          success: true,
-          transactionLink: transfer.getTransactionLink() as string,
-      }, { status: 201 });
-    } catch (error) {
+        if (transfer.getStatus() === 'complete') {
+            console.log(`Transfer successfully completed: `, transfer.toString());
+            return NextResponse.json({
+                success: true,
+                transactionLink: transfer.getTransactionLink() as string,
+            }, { status: 201 });
+        } else {
+            return NextResponse.json({
+                success: false,
+                error: 'Transaction not complete'
+            }, {status: 500 });
+        }
+      } catch (transferError: any) {
+        // Check if the error message contains "Insufficient funds"
+        if (transferError.message && transferError.message.includes("Insufficient funds")) {
+          return NextResponse.json({ 
+            error: 'Insufficient funds: Please use the faucet to get eth before making a transfer.'
+          }, { status: 400 });
+        }
+        // If it's not an "Insufficient funds" error, rethrow it to be caught by the outer catch block
+        throw transferError;
+      }
+    } catch (error: any) {
       console.error('Error creating transfer request:', error);
-      return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+      return NextResponse.json({ error: error.message || 'Internal server error' }, { status: 500 });
     }
   }
