@@ -52,6 +52,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Network ID is required' }, { status: 400 });
   }
 
+  // Disallow creation of new wallets on mainnet
+  if (networkId.includes('mainnet')) {
+    return NextResponse.json({ error: 'Mainnet is not allowed' }, { status: 400 });
+  }
+
   let walletResponse: WalletResponse;
   try {
 

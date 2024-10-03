@@ -10,7 +10,7 @@ import { WalletListResponse } from "./api/wallets/route";
 import { ChevronLeft, ChevronRight, Wallet } from "lucide-react";
 
 const WALLETS_PER_PAGE_OPTIONS = [10, 20, 50, 100];
-const SUPPORTED_NETWORKS = ['base-sepolia', 'base-mainnet'];
+const SUPPORTED_NETWORKS = ['base-sepolia'];
 
 export default function Home() {
   const [wallets, setWallets] = useState<WalletListResponse[]>([]);
