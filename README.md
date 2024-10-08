@@ -19,7 +19,7 @@ CDP_API_KEY_NAME="your-api-key-name"
 CDP_API_KEY_SECRET="your-api-key-secret"
 ENCRYPTION_KEY="your-encryption-key"
 POSTGRES_URL="postgresql://admin:password@localhost:5432/seeds"
-CDP_PROJECT_ID="your-cdp-project-id"
+NEXT_PUBLIC_CDP_PROJECT_ID="your-cdp-project-id"
 ```
 
 ### Run the Postgres DB

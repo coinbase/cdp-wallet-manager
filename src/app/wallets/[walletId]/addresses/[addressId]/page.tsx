@@ -140,10 +140,11 @@ export default function AddressPage({ params }: { params: { walletId: string, ad
   };
 
   const onrampUrl = useMemo(() => {
-    if (address && process.env.CDP_PROJECT_ID) {
+    if (address && process.env.NEXT_PUBLIC_CDP_PROJECT_ID) {
       const network = address.network.split('-')[0];
+      console.log('onramp projectId', process.env.NEXT_PUBLIC_CDP_PROJECT_ID);
       return getOnrampBuyUrl({
-        projectId: process.env.CDP_PROJECT_ID,
+        projectId: process.env.NEXT_PUBLIC_CDP_PROJECT_ID,
         addresses: { [address.address]: [network] },
       });
     }
