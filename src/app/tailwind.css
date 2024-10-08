@@ -7,4 +7,9 @@
     --bg-ock-primary: theme(colors.blue.600);
     --bg-ock-primary-hover: theme(colors.blue.500);
   }
+ 
+  .dark {
+    --bg-ock-primary: theme(colors.blue.600);
+    --bg-ock-primary-hover: theme(colors.blue.500);
+  }
 }
