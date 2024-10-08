@@ -1,3 +1,10 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+ 
+@layer base {
+  :root {
+    --bg-ock-primary: theme(colors.blue.600);
+    --bg-ock-primary-hover: theme(colors.blue.500);
+  }
+}
