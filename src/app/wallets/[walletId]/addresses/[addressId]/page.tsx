@@ -87,6 +87,14 @@ export default function AddressPage({ params }: { params: { walletId: string, ad
     setTransferSuccess('');
 
     try {
+      // Check if mainnet is disabled with /api/mainnet-status and if this wallet is in mainnet, return an error
+      const mainnetStatusResponse = await fetch('/api/mainnet-status');
+      if (!mainnetStatusResponse.ok) throw new Error('Failed to fetch mainnet status');
+      const { disabled } = await mainnetStatusResponse.json();
+      if (disabled && address?.network.split('-')[1] === 'mainnet') {
+        throw new Error('Transfers on mainnet is disabled. Deploy with vercel template to enable.');
+      }
+
       const response = await fetch(`/api/wallets/${params.walletId}/addresses/${params.addressId}/transfers`, {
         method: 'POST',
         headers: {
