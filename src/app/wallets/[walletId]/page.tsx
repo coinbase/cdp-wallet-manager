@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from "next/link";
 import { ArrowLeft, Wallet, ChevronLeft, ChevronRight } from "lucide-react";
 import { Card, CardBody, CardHeader, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Button, Spinner, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@nextui-org/react";
+import { formatNetworkId } from '@/utils/stringUtils';
 
 export type Wallet = {
   id: string;
@@ -94,7 +95,7 @@ export default function WalletPage({ params }: { params: { walletId: string } })
           <div className="grid grid-cols-2 gap-6">
             <div>
               <p className="text-sm font-medium text-gray-500 dark:text-gray-800 mb-1">Network</p>
-              <p className="text-base text-gray-500 dark:text-gray-800 ">{wallet.network}</p>
+              <p className="text-base text-gray-500 dark:text-gray-800 ">{formatNetworkId(wallet.network)}</p>
             </div>
             <div>
               <p className="text-sm font-medium text-gray-500 mb-1">Default Address</p>

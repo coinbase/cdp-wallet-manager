@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import { Wallet } from '@coinbase/coinbase-sdk';
-import { formatNetworkId } from '@/utils/stringUtils';
 import  '@/lib/server/coinbase';
 import {createWallet} from "@/app/db/db";
 import {WalletResponse} from "@/app/api/wallets/[walletId]/route";
@@ -30,7 +29,7 @@ export async function GET() {
     const walletListResponse = filteredWallets.map((wallet) => ({
       id: wallet.getId(),
       name: "My Wallet",
-      network: formatNetworkId(wallet.getNetworkId()),
+      network: wallet.getNetworkId(),
     }));
     return NextResponse.json(walletListResponse);
   } catch (error) {
@@ -74,7 +73,7 @@ export async function POST(request: Request) {
 
     walletResponse = {
       id: wallet.getId() as string,
-      network: formatNetworkId(wallet.getNetworkId()),
+      network: wallet.getNetworkId(),
       addresses: [defaultAddress.getId()],
       defaultAddress: defaultAddress.getId(),
       balances: formattedBalances,

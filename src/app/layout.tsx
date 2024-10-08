@@ -5,6 +5,7 @@ import Link from 'next/link'
 import "./globals.css";
 import './tailwind.css'
 import { Providers } from "./providers";
+import '@coinbase/onchainkit/styles.css';
 
 const inter = Inter({
   subsets: ['latin'],
