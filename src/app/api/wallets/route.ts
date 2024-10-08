@@ -5,6 +5,8 @@ import  '@/lib/server/coinbase';
 import {createWallet} from "@/app/db/db";
 import {WalletResponse} from "@/app/api/wallets/[walletId]/route";
 
+const MAINNET_DISABLED = process.env.MAINNET_DISABLED === 'true';
+
 export interface WalletListResponse {
   id: string;
   name: string;
@@ -50,6 +52,11 @@ export async function POST(request: Request) {
 
   if (networkId === undefined) {
     return NextResponse.json({ error: 'Network ID is required' }, { status: 400 });
+  }
+
+  // Check if mainnet is disabled and the requested network is mainnet
+  if (MAINNET_DISABLED && networkId.includes('mainnet')) {
+    return NextResponse.json({ error: 'Mainnet is not allowed' }, { status: 400 });
   }
 
   let walletResponse: WalletResponse;

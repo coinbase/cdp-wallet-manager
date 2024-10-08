@@ -59,10 +59,15 @@ export default function WalletPage({ params }: { params: { walletId: string } })
     );
   }
 
-  const totalBalancePages = Math.ceil(Object.keys(wallet.balances).length / balancesPerPage);
+  const totalBalancePages = Math.ceil(Math.max(Object.keys(wallet.balances).length, 1) / balancesPerPage);
   const startIndex = (currentPage - 1) * balancesPerPage;
   const endIndex = startIndex + balancesPerPage;
-  const currentBalances = Object.entries(wallet.balances).slice(startIndex, endIndex);
+  let currentBalances = Object.entries(wallet.balances).slice(startIndex, endIndex);
+  
+  // Add empty ETH balance if no balances exist
+  if (currentBalances.length === 0) {
+    currentBalances = [['eth', 0]];
+  }
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
