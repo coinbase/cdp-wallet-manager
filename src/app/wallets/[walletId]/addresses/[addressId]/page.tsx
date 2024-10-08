@@ -1,11 +1,12 @@
 'use client'
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Link from "next/link";
 import { ArrowLeft, CreditCard, ChevronLeft, ChevronRight } from "lucide-react";
 import { Card, CardBody, CardHeader, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Button, Spinner, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@nextui-org/react";
 import { AddressResponse } from '@/app/api/wallets/[walletId]/addresses/[addressId]/route';
 import CustomInput from '@/app/components/CustomInput';
+import { getOnrampBuyUrl, FundButton } from '@coinbase/onchainkit/fund';
 
 const BALANCES_PER_PAGE_OPTIONS = [5, 10, 20, 50];
 
@@ -130,6 +131,20 @@ export default function AddressPage({ params }: { params: { walletId: string, ad
     setCurrentPage(1); // Reset to first page when changing items per page
   };
 
+  const onrampUrl = useMemo(() => {
+    if (address && process.env.NEXT_PUBLIC_CDP_PROJECT_ID) {
+      const network = address.network.split('-')[0];
+      return getOnrampBuyUrl({
+        projectId: process.env.NEXT_PUBLIC_CDP_PROJECT_ID,
+        addresses: { [address.address]: [network] },
+      });
+    }
+  }, [address]);
+
+  const isMainnet = useMemo(() => {
+    return address?.network.split('-')[1] === 'mainnet';
+  }, [ address ]);
+
   if (addressLoading) {
     return (
       <div className="fixed inset-0 bg-background/50 backdrop-blur-md flex justify-center items-center z-50">
@@ -151,6 +166,38 @@ export default function AddressPage({ params }: { params: { walletId: string, ad
   if (currentBalances.length === 0) {
     currentBalances = [['eth', 0]];
   }
+
+  const faucetCard = (
+    <Card className="border border-gray-200 shadow-sm">
+      <CardHeader className="px-6 py-4 bg-gray-50">
+        <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-800">Request Faucet Funds</h2>
+      </CardHeader>
+      <CardBody className="px-6 py-4">
+        <Button
+          color="primary"
+          variant="solid"
+          onClick={handleFaucetRequest}
+          isLoading={faucetLoading}
+          className="w-full bg-blue-600 text-white hover:bg-blue-700"
+        >
+          {faucetLoading ? 'Requesting...' : 'Request Faucet'}
+        </Button>
+        {faucetError && <p className="text-danger mt-2">{faucetError}</p>}
+        {faucetSuccess && <p className="text-success mt-2">{faucetSuccess}</p>}
+      </CardBody>
+    </Card>
+  );
+
+  const onrampCard = (
+    <Card className="border border-gray-200 shadow-sm">
+      <CardHeader className="px-6 py-4 bg-gray-50">
+        <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-800">Onramp Funds</h2>
+      </CardHeader>
+      <CardBody className="px-6 py-4">
+        <FundButton fundingUrl={onrampUrl} />
+      </CardBody>
+    </Card>
+  )
 
   return (
     <div className="container max-w-4xl mx-auto p-4 space-y-6">
@@ -264,24 +311,7 @@ export default function AddressPage({ params }: { params: { walletId: string, ad
       </Card>
 
       <div className="grid grid-cols-1 gap-6">
-        <Card className="border border-gray-200 shadow-sm">
-          <CardHeader className="px-6 py-4 bg-gray-50">
-            <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-800">Request Faucet Funds</h2>
-          </CardHeader>
-          <CardBody className="px-6 py-4">
-            <Button
-              color="primary"
-              variant="solid"
-              onClick={handleFaucetRequest}
-              isLoading={faucetLoading}
-              className="w-full bg-blue-600 text-white hover:bg-blue-700"
-            >
-              {faucetLoading ? 'Requesting...' : 'Request Faucet'}
-            </Button>
-            {faucetError && <p className="text-danger mt-2">{faucetError}</p>}
-            {faucetSuccess && <p className="text-success mt-2">{faucetSuccess}</p>}
-          </CardBody>
-        </Card>
+        {isMainnet ? onrampCard : faucetCard }
 
         <Card className="border border-gray-200 shadow-sm">
           <CardHeader className="px-6 py-4 bg-gray-50">

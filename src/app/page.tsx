@@ -8,6 +8,7 @@ import { Selection } from "@nextui-org/react";
 import { ChevronDownIcon } from '@heroicons/react/20/solid';
 import { WalletListResponse } from "./api/wallets/route";
 import { ChevronLeft, ChevronRight, Wallet } from "lucide-react";
+import { formatNetworkId } from "@/utils/stringUtils";
 
 const WALLETS_PER_PAGE_OPTIONS = [10, 20, 50, 100];
 const SUPPORTED_NETWORKS = ['base-sepolia', 'base-mainnet'];
@@ -172,7 +173,7 @@ export default function Home() {
                       {wallet.id}
                     </span>
                   </TableCell>
-                  <TableCell>{wallet.network}</TableCell>
+                  <TableCell>{formatNetworkId(wallet.network)}</TableCell>
                 </TableRow>
               ))}
             </TableBody>

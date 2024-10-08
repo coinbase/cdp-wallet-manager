@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@coinbase/coinbase-sdk": "^0.7.0",
+    "@coinbase/onchainkit": "^0.33.4",
     "@heroicons/react": "^2.1.5",
     "@nextui-org/react": "^2.4.8",
     "@prisma/client": "^5.20.0",

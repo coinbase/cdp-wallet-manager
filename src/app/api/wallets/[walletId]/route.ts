@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import { Wallet } from '@coinbase/coinbase-sdk';
-import { formatNetworkId } from '@/utils/stringUtils';
 import '@/lib/server/coinbase';
 
 export interface WalletResponse {
@@ -30,7 +29,7 @@ export async function GET(request: Request, { params }: { params: { walletId: st
 
     walletResponse = {
       id: wallet.getId() as string,
-      network: formatNetworkId(wallet.getNetworkId()),
+      network: wallet.getNetworkId(),
       addresses: addressIds,
       defaultAddress: defaultAddressId,
       balances: formattedBalances,
