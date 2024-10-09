@@ -48,23 +48,28 @@ export default function RootLayout({
                 <Link href="/">
                   <Image src="/logo.png" alt="CDP SDK Logo" width={120} height={40} />
                 </Link>
-                <ul className="flex space-x-6 items-center">
-                  <li>
-                    <a href="https://docs.cdp.coinbase.com/cdp-sdk/docs/welcome" className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors" target="_blank" rel="noopener noreferrer">
-                      <FaLightbulb size={24} />
-                    </a>
-                  </li>
-                  <li>
-                    <a href="https://github.com/coinbase/coinbase-sdk-nodejs" className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors" target="_blank" rel="noopener noreferrer">
-                      <FaGithub size={24} />
-                    </a>
-                  </li>
-                  <li>
-                    <a href="https://discord.gg/cdp" className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors" target="_blank" rel="noopener noreferrer">
-                      <FaDiscord size={24} />
-                    </a>
-                  </li>
-                </ul>
+                <div className="flex items-center space-x-6">
+                  <ul className="flex space-x-6 items-center">
+                    <li>
+                      <a href="https://docs.cdp.coinbase.com/cdp-sdk/docs/welcome" className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors" target="_blank" rel="noopener noreferrer">
+                        <FaLightbulb size={24} />
+                      </a>
+                    </li>
+                    <li>
+                      <a href="https://github.com/coinbase/coinbase-sdk-nodejs" className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors" target="_blank" rel="noopener noreferrer">
+                        <FaGithub size={24} />
+                      </a>
+                    </li>
+                    <li>
+                      <a href="https://discord.gg/cdp" className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors" target="_blank" rel="noopener noreferrer">
+                        <FaDiscord size={24} />
+                      </a>
+                    </li>
+                  </ul>
+                  <a href="https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fcoinbase%2Fcdp-wallet-manager&env=CDP_API_KEY_NAME,CDP_API_KEY_SECRET,NEXT_PUBLIC_CDP_PROJECT_ID&envDescription=Download%20CDP%20API%20key%20name%2C%20secret%2C%20project%20ID%20from%20CDP%20portal" target="_blank" rel="noopener noreferrer">
+                    <img src="https://vercel.com/button" alt="Deploy with Vercel" />
+                  </a>
+                </div>
               </nav>
             </header>
             <main>
