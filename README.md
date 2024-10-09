@@ -1,4 +1,32 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# CDP Wallet Manager
+
+The CDP Wallet Manager is a comprehensive web application that showcases the capabilities of the Coinbase Developer Platform (CDP) SDK. This project serves as a powerful demonstration of how developers can leverage CDP to build robust, user-friendly blockchain applications.
+
+## Key Features:
+
+1. **Wallet Management**: Create, view, and manage MPC wallets across different networks.
+
+2. **Address Handling**: Generate and manage addresses within each wallet, supporting various blockchain networks.
+
+3. **Balance Tracking**: Real-time balance display for each address, supporting multiple cryptocurrencies.
+
+4. **Faucet Integration**: Easy access to testnet faucets for quick funding of addresses during development and testing.
+
+5. **Transfer Functionality**: Seamless creation and execution of cryptocurrency transfers between addresses.
+
+6. **Onramp Support**: Integration with Coinbase's onramp feature, allowing users to buy cryptocurrencies directly within the application.
+
+7. **Network Flexibility**: Support for both mainnet and testnet environments, with easy switching between networks.
+
+8. **Responsive Design**: A clean, intuitive user interface that works across desktop and mobile devices.
+
+9. **Dark Mode**: Built-in dark mode support for enhanced user experience in different lighting conditions.
+
+This project is ideal for developers looking to understand the implementation of blockchain wallet functionalities using the CDP SDK. It provides a solid foundation that can be extended and customized for various blockchain-based applications.
+
+By exploring and using the CDP Wallet Manager, developers can gain hands-on experience with key blockchain operations, security best practices, and user interface design for crypto applications.
+
+Whether you're building a DeFi platform, a crypto portfolio tracker, or any other blockchain-based service, the CDP Wallet Manager offers valuable insights and a practical starting point for your development journey with the Coinbase Developer Platform.
 
 ## Getting Started
 ### Get your API keys
