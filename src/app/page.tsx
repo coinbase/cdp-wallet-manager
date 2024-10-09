@@ -9,6 +9,7 @@ import { ChevronDownIcon } from '@heroicons/react/20/solid';
 import { WalletListResponse } from "./api/wallets/route";
 import { ChevronLeft, ChevronRight, Wallet } from "lucide-react";
 import { formatNetworkId } from "@/utils/stringUtils";
+import { Tooltip } from "@nextui-org/react";
 
 const WALLETS_PER_PAGE_OPTIONS = [10, 20, 50, 100];
 const SUPPORTED_NETWORKS = ['base-sepolia', 'base-mainnet'];
@@ -246,14 +247,23 @@ export default function Home() {
                 ))}
               </DropdownMenu>
             </Dropdown>
-            <Button
-              color="primary"
-              className="text-sm text-white bg-blue-600 hover:bg-blue-700"
-              disabled={createWalletLoading || (selectedNetwork !== "all" && selectedNetwork.size === 0)}
-              onClick={handleCreateWallet}
+            <Tooltip
+              content="Deploy the vercel template to create wallets"
+              isDisabled={!mainnetDisabled}
             >
-              {createWalletLoading ? <Spinner size="sm" /> : 'Create Wallet'}
-            </Button>
+              <div className="inline-block"> {/* Wrapper div for the button */}
+                <Button
+                  color="primary"
+                  className={`text-sm text-white bg-blue-600 hover:bg-blue-700 ${
+                    mainnetDisabled ? 'opacity-50 cursor-not-allowed filter' : ''
+                  }`}
+                  disabled={createWalletLoading || (selectedNetwork !== "all" && selectedNetwork.size === 0) || mainnetDisabled}
+                  onClick={handleCreateWallet}
+                >
+                  {createWalletLoading ? <Spinner size="sm" /> : 'Create Wallet'}
+                </Button>
+              </div>
+            </Tooltip>
           </div>
           {createWalletError && <p className="text-red-500 dark:text-red-400 mt-4 text-sm">{createWalletError}</p>}
         </CardBody>

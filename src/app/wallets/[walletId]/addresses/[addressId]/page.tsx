@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import Link from "next/link";
 import { ArrowLeft, CreditCard, ChevronLeft, ChevronRight } from "lucide-react";
-import { Card, CardBody, CardHeader, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Button, Spinner, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@nextui-org/react";
+import { Card, CardBody, CardHeader, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Button, Spinner, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Tooltip } from "@nextui-org/react";
 import { AddressResponse } from '@/app/api/wallets/[walletId]/addresses/[addressId]/route';
 import CustomInput from '@/app/components/CustomInput';
 import { getOnrampBuyUrl, FundButton } from '@coinbase/onchainkit/fund';
@@ -26,6 +26,7 @@ export default function AddressPage({ params }: { params: { walletId: string, ad
   const [transferSuccess, setTransferSuccess] = useState('');
   const [balancesPerPage, setBalancesPerPage] = useState(BALANCES_PER_PAGE_OPTIONS[0]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [mainnetDisabled, setMainnetDisabled] = useState(true);
 
   const fetchAddress = async () => {
     try {
@@ -46,6 +47,7 @@ export default function AddressPage({ params }: { params: { walletId: string, ad
 
   useEffect(() => {
     fetchAddress();
+    checkMainnetStatus();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.walletId, params.addressId]);
 
@@ -153,6 +155,17 @@ export default function AddressPage({ params }: { params: { walletId: string, ad
     return address?.network.split('-')[1] === 'mainnet';
   }, [ address ]);
 
+  const checkMainnetStatus = async () => {
+    try {
+      const response = await fetch('/api/mainnet-status');
+      if (!response.ok) throw new Error('Failed to fetch mainnet status');
+      const { disabled } = await response.json();
+      setMainnetDisabled(disabled);
+    } catch (err) {
+      console.error('Error fetching mainnet status:', err);
+    }
+  };
+
   if (addressLoading) {
     return (
       <div className="fixed inset-0 bg-background/50 backdrop-blur-md flex justify-center items-center z-50">
@@ -181,15 +194,25 @@ export default function AddressPage({ params }: { params: { walletId: string, ad
         <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-800">Request Faucet Funds</h2>
       </CardHeader>
       <CardBody className="px-6 py-4">
-        <Button
-          color="primary"
-          variant="solid"
-          onClick={handleFaucetRequest}
-          isLoading={faucetLoading}
-          className="w-full bg-blue-600 text-white hover:bg-blue-700"
+        <Tooltip
+          content="Deploy your Vercel template to enable faucet requests"
+          isDisabled={!mainnetDisabled}
         >
-          {faucetLoading ? 'Requesting...' : 'Request Faucet'}
-        </Button>
+          <div className="w-full"> {/* Wrapper div for the button */}
+            <Button
+              color="primary"
+              variant="solid"
+              onClick={handleFaucetRequest}
+              isLoading={faucetLoading}
+              isDisabled={mainnetDisabled}
+              className={`w-full bg-blue-600 text-white hover:bg-blue-700 ${
+                mainnetDisabled ? 'opacity-80 cursor-not-allowed filter' : ''
+              }`}
+            >
+              {faucetLoading ? 'Requesting...' : 'Request Faucet'}
+            </Button>
+          </div>
+        </Tooltip>
         {faucetError && <p className="text-danger mt-2">{faucetError}</p>}
         {faucetSuccess && <p className="text-success mt-2">{faucetSuccess}</p>}
       </CardBody>
@@ -351,14 +374,24 @@ export default function AddressPage({ params }: { params: { walletId: string, ad
                 required
                 placeholder="eth, usdc, etc."
               />
-              <Button
-                color="primary"
-                type="submit"
-                isLoading={transferLoading}
-                className="w-full bg-blue-600 text-white hover:bg-blue-700"
+              <Tooltip
+                content="Deploy your Vercel template to enable transfers"
+                isDisabled={!mainnetDisabled}
               >
-                {transferLoading ? 'Creating Transfer...' : 'Create Transfer'}
-              </Button>
+                <div className="w-full"> {/* Wrapper div for the button */}
+                  <Button
+                    color="primary"
+                    type="submit"
+                    isLoading={transferLoading}
+                    isDisabled={mainnetDisabled}
+                    className={`w-full bg-blue-600 text-white hover:bg-blue-700 ${
+                      mainnetDisabled ? 'opacity-80 cursor-not-allowed filter' : ''
+                    }`}
+                  >
+                    {transferLoading ? 'Creating Transfer...' : 'Create Transfer'}
+                  </Button>
+                </div>
+              </Tooltip>
             </form>
             {transferError && (
               <div className="mt-2 text-danger">
