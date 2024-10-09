@@ -20,6 +20,7 @@
     "@nextui-org/react": "^2.4.8",
     "@prisma/client": "^5.20.0",
     "@tailwindcss/forms": "^0.5.9",
+    "@vercel/edge": "^1.1.2",
     "crypto-js": "^4.2.0",
     "framer-motion": "^11.9.0",
     "lucide-react": "^0.439.0",
