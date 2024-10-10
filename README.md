@@ -34,6 +34,8 @@ Go to https://portal.cdp.coinbase.com/ and create an API key if you don't alread
 
 ### Create an encryption key
 
+This encryption key is used to secure your private keys stored in vercel postgres. You can generate one using the following command:
+
 ```bash
 openssl rand -hex 32
 ```
