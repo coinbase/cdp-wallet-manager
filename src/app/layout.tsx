@@ -66,7 +66,7 @@ export default function RootLayout({
                       </a>
                     </li>
                   </ul>
-                  <a href="https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fcoinbase%2Fcdp-wallet-manager&env=CDP_API_KEY_NAME,CDP_API_KEY_SECRET,NEXT_PUBLIC_CDP_PROJECT_ID&envDescription=Download%20CDP%20API%20key%20name%2C%20secret%2C%20project%20ID%20from%20CDP%20portal" target="_blank" rel="noopener noreferrer">
+                  <a href="https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fcoinbase%2Fcdp-wallet-manager&env=CDP_API_KEY_NAME,CDP_API_KEY_SECRET,NEXT_PUBLIC_CDP_PROJECT_ID,ENCRYPTION_KEY&envDescription=Download%20CDP%20API%20key%20name%2C%20secret%2C%20project%20ID%20from%20CDP%20portal" target="_blank" rel="noopener noreferrer">
                     <img src="https://vercel.com/button" alt="Deploy with Vercel" />
                   </a>
                 </div>
