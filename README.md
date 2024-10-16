@@ -29,7 +29,7 @@ By exploring and using the CDP Wallet Manager, developers can gain hands-on expe
 
 Whether you're building a DeFi platform, a crypto portfolio tracker, or any other blockchain-based service, the CDP Wallet Manager offers valuable insights and a practical starting point for your development journey with the Coinbase Developer Platform.
 
-The application does not have built-in authentication. Ensure that you add an authentication layer before deploying it to production.
+***The application does not have built-in authentication. Ensure that you add an authentication layer before deploying it to production.***
 
 ## Getting Started
 ### Get your API keys
