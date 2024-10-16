@@ -1,6 +1,7 @@
 # CDP Wallet Manager
 
 The CDP Wallet Manager is a comprehensive web application that showcases the capabilities of the Coinbase Developer Platform (CDP) SDK. This project serves as a powerful demonstration of how developers can leverage CDP to build robust, user-friendly blockchain applications.
+To learn more about CDP, check out the [developer docs](https://docs.cdp.coinbase.com/cdp-apis/docs/welcome).
 
 ## Key Features:
 
@@ -27,6 +28,8 @@ This project is ideal for developers looking to understand the implementation of
 By exploring and using the CDP Wallet Manager, developers can gain hands-on experience with key blockchain operations, security best practices, and user interface design for crypto applications.
 
 Whether you're building a DeFi platform, a crypto portfolio tracker, or any other blockchain-based service, the CDP Wallet Manager offers valuable insights and a practical starting point for your development journey with the Coinbase Developer Platform.
+
+***The application does not have built-in authentication. Ensure that you add an authentication layer before deploying it to production.***
 
 ## Getting Started
 ### Get your API keys
