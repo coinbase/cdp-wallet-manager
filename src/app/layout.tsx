@@ -76,7 +76,7 @@ export default function RootLayout({
               {children}
             </main>
             <footer className="py-10 text-center text-gray-600 dark:text-gray-400 bg-white dark:bg-gray-800 mt-20 border-t border-lavender-200 dark:border-gray-700">
-              <p>&copy; 2024 CDP SDK. All rights reserved.</p>
+              <p>&copy; 2025 CDP SDK. All rights reserved.</p>
               <p>
                 By using this app, you agree to the{' '}
                 <a 
@@ -86,6 +86,16 @@ export default function RootLayout({
                   className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline"
                 >
                   Terms of Service
+                </a>
+              </p>
+              <p>
+                <a
+                    href="https://www.coinbase.com/legal/privacy"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline"
+                >
+                  Privacy Policy
                 </a>
               </p>
             </footer>
